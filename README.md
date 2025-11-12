@@ -1,5 +1,9 @@
 # Manus AI PHP SDK
 
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/eb30d0e5-3d22-4edb-bb42-dd4e751b5cf4" alt="Monica AI PHP SDK" style="max-width: 100%; height: auto;">
+</div>
+
 🚀 Complete PHP library for integration with [Manus AI](https://manus.ai) API. Easily integrate Manus AI agent into your PHP applications with full Laravel support.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
@@ -116,12 +120,27 @@ Tasks are the core of Manus AI - they represent AI agent work items that can per
 [API Docs: Create Task](https://open.manus.ai/docs/api-reference/create-task)
 
 ```php
+use Tigusigalpa\ManusAI\Helpers\AgentProfile;
+
 $task = $client->createTask('Your task prompt here', [
-    'agentProfile' => 'manus-1.5',      // or 'manus-1.5-lite'
-    'taskMode' => 'agent',               // 'chat', 'adaptive', or 'agent'
+    'agentProfile' => AgentProfile::MANUS_1_5,  // or AgentProfile::MANUS_1_5_LITE
+    'taskMode' => 'agent',                       // 'chat', 'adaptive', or 'agent'
     'locale' => 'en-US',
     'hideInTaskList' => false,
     'createShareableLink' => true,
+]);
+```
+
+**Available Agent Profiles:**
+- `AgentProfile::MANUS_1_5` - Latest and most capable model (recommended)
+- `AgentProfile::MANUS_1_5_LITE` - Faster, lightweight version
+- `AgentProfile::SPEED` - ⚠️ Deprecated, use `MANUS_1_5_LITE` instead
+- `AgentProfile::QUALITY` - ⚠️ Deprecated, use `MANUS_1_5` instead
+
+```php
+// Or use string values directly
+$task = $client->createTask('Your prompt', [
+    'agentProfile' => 'manus-1.5',
 ]);
 ```
 
@@ -402,6 +421,16 @@ php artisan manus-ai:task delete --id=task_123
 - `TaskAttachment::fromUrl(string $url): array`
 - `TaskAttachment::fromBase64(string $data, string $mimeType): array`
 - `TaskAttachment::fromFilePath(string $path): array`
+
+#### AgentProfile
+- `AgentProfile::MANUS_1_5` - Latest model (recommended)
+- `AgentProfile::MANUS_1_5_LITE` - Lightweight version
+- `AgentProfile::SPEED` - Deprecated
+- `AgentProfile::QUALITY` - Deprecated
+- `AgentProfile::all(): array` - Get all profiles
+- `AgentProfile::recommended(): array` - Get recommended profiles
+- `AgentProfile::isValid(string $profile): bool`
+- `AgentProfile::isDeprecated(string $profile): bool`
 
 #### WebhookHandler
 - `WebhookHandler::parsePayload(string $json): array`
