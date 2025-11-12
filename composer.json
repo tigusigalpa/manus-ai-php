@@ -1,0 +1,68 @@
+{
+    "name": "tigusigalpa/manus-ai-php",
+    "description": "🚀 Manus AI PHP SDK - Complete library for integration with Manus AI API. Easy integration of Manus AI agent into PHP applications with Laravel support. Task automation, AI agents, file management. Full documentation, code examples, API support.",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Igor Sazonov",
+            "email": "sovletig@gmail.com",
+            "homepage": "https://github.com/tigusigalpa"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "guzzlehttp/guzzle": "^7.8",
+        "illuminate/support": "^8|^9|^10|^11|^12"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.0|^11.0",
+        "mockery/mockery": "^1.6",
+        "orchestra/testbench": "^8.0|^9.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Tigusigalpa\\ManusAI\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tigusigalpa\\ManusAI\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "test-coverage": "phpunit --coverage-html coverage"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Tigusigalpa\\ManusAI\\Laravel\\ManusAIServiceProvider"
+            ],
+            "aliases": {
+                "ManusAI": "Tigusigalpa\\ManusAI\\Laravel\\ManusAI"
+            }
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "keywords": [
+        "manus",
+        "manus-ai",
+        "ai",
+        "agent",
+        "automation",
+        "laravel",
+        "php",
+        "sdk",
+        "api",
+        "artificial-intelligence",
+        "task-automation"
+    ],
+    "homepage": "https://github.com/tigusigalpa/manus-ai-php",
+    "support": {
+        "issues": "https://github.com/tigusigalpa/manus-ai-php/issues",
+        "source": "https://github.com/tigusigalpa/manus-ai-php",
+        "docs": "https://open.manus.ai/docs"
+    }
+}
