@@ -41,7 +41,7 @@ try {
     $taskResult = $client->createTask(
         'Analyze the content of the attached file and provide a summary',
         [
-            'agentProfile' => 'manus-1.5',
+            'agentProfile' => 'manus-1.6',
             'attachments' => [$attachment],
         ]
     );

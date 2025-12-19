@@ -43,7 +43,7 @@ $client = new ManusAIClient('ваш-api-ключ');
 
 // Создать задачу
 $result = $client->createTask('Напиши стихотворение о PHP', [
-    'agentProfile' => 'manus-1.5',
+    'agentProfile' => 'manus-1.6',
     'taskMode' => 'chat',
 ]);
 
@@ -73,7 +73,7 @@ $tasks = ManusAI::getTasks(['limit' => 10]);
 ```php
 // Создать задачу
 $task = $client->createTask('Ваш запрос', [
-    'agentProfile' => 'manus-1.5',
+    'agentProfile' => 'manus-1.6',
     'taskMode' => 'agent',
     'locale' => 'ru-RU',
 ]);

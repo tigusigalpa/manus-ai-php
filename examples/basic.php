@@ -14,7 +14,7 @@ try {
     // 1. Create a simple task
     echo "1. Creating a task...\n";
     $result = $client->createTask('Write a short poem about PHP programming', [
-        'agentProfile' => 'manus-1.5',
+        'agentProfile' => 'manus-1.6',
         'taskMode' => 'chat',
     ]);
 

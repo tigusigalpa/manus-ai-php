@@ -20,7 +20,7 @@ class ManusAITestCommand extends Command
             $this->info("Creating test task: {$taskPrompt}");
             
             $result = $client->createTask($taskPrompt, [
-                'agentProfile' => 'manus-1.5',
+                'agentProfile' => 'manus-1.6',
                 'taskMode' => 'chat',
             ]);
 

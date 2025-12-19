@@ -84,7 +84,7 @@ php artisan vendor:publish --tag=manus-ai-config
 
 ```env
 MANUS_AI_API_KEY=your-api-key-here
-MANUS_AI_DEFAULT_AGENT_PROFILE=manus-1.5
+MANUS_AI_DEFAULT_AGENT_PROFILE=manus-1.6
 MANUS_AI_DEFAULT_TASK_MODE=agent
 ```
 
@@ -101,7 +101,7 @@ $client = new ManusAIClient('your-api-key');
 
 // Create a task
 $result = $client->createTask('Write a poem about PHP programming', [
-    'agentProfile' => 'manus-1.5',
+    'agentProfile' => 'manus-1.6',
     'taskMode' => 'chat',
 ]);
 
@@ -123,7 +123,7 @@ Tasks are the core of Manus AI - they represent AI agent work items that can per
 use Tigusigalpa\ManusAI\Helpers\AgentProfile;
 
 $task = $client->createTask('Your task prompt here', [
-    'agentProfile' => AgentProfile::MANUS_1_5,  // or AgentProfile::MANUS_1_5_LITE
+    'agentProfile' => AgentProfile::MANUS_1_6,  // or AgentProfile::MANUS_1_6_LITE, MANUS_1_6_MAX
     'taskMode' => 'agent',                       // 'chat', 'adaptive', or 'agent'
     'locale' => 'en-US',
     'hideInTaskList' => false,
@@ -132,15 +132,16 @@ $task = $client->createTask('Your task prompt here', [
 ```
 
 **Available Agent Profiles:**
-- `AgentProfile::MANUS_1_5` - Latest and most capable model (recommended)
-- `AgentProfile::MANUS_1_5_LITE` - Faster, lightweight version
-- `AgentProfile::SPEED` - ⚠️ Deprecated, use `MANUS_1_5_LITE` instead
-- `AgentProfile::QUALITY` - ⚠️ Deprecated, use `MANUS_1_5` instead
+- `AgentProfile::MANUS_1_6` - Latest and most capable model (recommended)
+- `AgentProfile::MANUS_1_6_LITE` - Faster, lightweight version
+- `AgentProfile::MANUS_1_6_MAX` - Maximum capability version
+- `AgentProfile::SPEED` - ⚠️ Deprecated, use `MANUS_1_6_LITE` instead
+- `AgentProfile::QUALITY` - ⚠️ Deprecated, use `MANUS_1_6` instead
 
 ```php
 // Or use string values directly
 $task = $client->createTask('Your prompt', [
-    'agentProfile' => 'manus-1.5',
+    'agentProfile' => 'manus-1.6',
 ]);
 ```
 
@@ -377,7 +378,7 @@ php artisan manus-ai:test --task="Custom test prompt"
 Manage tasks:
 ```bash
 # Create task
-php artisan manus-ai:task create --prompt="Your prompt" --profile=manus-1.5
+php artisan manus-ai:task create --prompt="Your prompt" --profile=manus-1.6
 
 # List tasks
 php artisan manus-ai:task list --limit=10 --status=completed
@@ -423,8 +424,9 @@ php artisan manus-ai:task delete --id=task_123
 - `TaskAttachment::fromFilePath(string $path): array`
 
 #### AgentProfile
-- `AgentProfile::MANUS_1_5` - Latest model (recommended)
-- `AgentProfile::MANUS_1_5_LITE` - Lightweight version
+- `AgentProfile::MANUS_1_6` - Latest model (recommended)
+- `AgentProfile::MANUS_1_6_LITE` - Lightweight version
+- `AgentProfile::MANUS_1_6_MAX` - Maximum capability version
 - `AgentProfile::SPEED` - Deprecated
 - `AgentProfile::QUALITY` - Deprecated
 - `AgentProfile::all(): array` - Get all profiles

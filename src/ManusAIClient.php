@@ -41,7 +41,7 @@ class ManusAIClient implements ManusAIClientInterface
 
         $payload = array_merge([
             'prompt' => $prompt,
-            'agentProfile' => 'manus-1.5',
+            'agentProfile' => 'manus-1.6',
         ], $options);
 
         return $this->request('POST', '/v1/tasks', $payload);

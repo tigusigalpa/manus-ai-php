@@ -5,24 +5,29 @@ namespace Tigusigalpa\ManusAI\Helpers;
 class AgentProfile
 {
     /**
-     * Manus 1.5 - Latest and most capable model (recommended)
+     * Manus 1.6 - Latest and most capable model (recommended)
      */
-    public const MANUS_1_5 = 'manus-1.5';
+    public const MANUS_1_6 = 'manus-1.6';
 
     /**
-     * Manus 1.5 Lite - Faster, lightweight version
+     * Manus 1.6 Lite - Faster, lightweight version
      */
-    public const MANUS_1_5_LITE = 'manus-1.5-lite';
+    public const MANUS_1_6_LITE = 'manus-1.6-lite';
 
     /**
-     * Speed - Deprecated, use MANUS_1_5_LITE instead
-     * @deprecated Use MANUS_1_5_LITE instead
+     * Manus 1.6 Max - Maximum capability version
+     */
+    public const MANUS_1_6_MAX = 'manus-1.6-max';
+
+    /**
+     * Speed - Deprecated, use MANUS_1_6_LITE instead
+     * @deprecated Use MANUS_1_6_LITE instead
      */
     public const SPEED = 'speed';
 
     /**
-     * Quality - Deprecated, use MANUS_1_5 instead
-     * @deprecated Use MANUS_1_5 instead
+     * Quality - Deprecated, use MANUS_1_6 instead
+     * @deprecated Use MANUS_1_6 instead
      */
     public const QUALITY = 'quality';
 
@@ -34,8 +39,9 @@ class AgentProfile
     public static function all(): array
     {
         return [
-            self::MANUS_1_5,
-            self::MANUS_1_5_LITE,
+            self::MANUS_1_6,
+            self::MANUS_1_6_LITE,
+            self::MANUS_1_6_MAX,
             self::SPEED,
             self::QUALITY,
         ];
@@ -49,8 +55,9 @@ class AgentProfile
     public static function recommended(): array
     {
         return [
-            self::MANUS_1_5,
-            self::MANUS_1_5_LITE,
+            self::MANUS_1_6,
+            self::MANUS_1_6_LITE,
+            self::MANUS_1_6_MAX,
         ];
     }
 

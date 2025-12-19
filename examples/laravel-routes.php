@@ -12,7 +12,7 @@ Route::get('/manus-ai/demo', function () {
     try {
         // Using Facade
         $result = ManusAI::createTask('Explain Laravel routing in 3 sentences', [
-            'agentProfile' => 'manus-1.5',
+            'agentProfile' => 'manus-1.6',
             'taskMode' => 'chat',
         ]);
 
@@ -75,7 +75,7 @@ Route::post('/manus-ai/task-with-file', function (Request $request) {
         $attachment = TaskAttachment::fromFileId($fileResult['id']);
         
         $taskResult = ManusAI::createTask($request->input('prompt'), [
-            'agentProfile' => 'manus-1.5',
+            'agentProfile' => 'manus-1.6',
             'attachments' => [$attachment],
         ]);
 

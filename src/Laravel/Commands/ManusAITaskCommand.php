@@ -11,7 +11,7 @@ class ManusAITaskCommand extends Command
                             {action : Action to perform: create, list, get, update, delete}
                             {--id= : Task ID for get, update, or delete actions}
                             {--prompt= : Task prompt for create action}
-                            {--profile=manus-1.5 : Agent profile (manus-1.5, manus-1.5-lite)}
+                            {--profile=manus-1.6 : Agent profile (manus-1.6, manus-1.6-lite, manus-1.6-max)}
                             {--mode=agent : Task mode (chat, adaptive, agent)}
                             {--title= : New title for update action}
                             {--limit=10 : Number of tasks to retrieve in list action}

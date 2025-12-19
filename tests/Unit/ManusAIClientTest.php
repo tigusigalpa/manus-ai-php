@@ -59,7 +59,7 @@ class ManusAIClientTest extends TestCase
         $mockResponse = [
             'id' => 'task_123',
             'status' => 'completed',
-            'model' => 'manus-1.5',
+            'model' => 'manus-1.6',
         ];
 
         $client = $this->createMockClient([

@@ -7,8 +7,8 @@ return [
     // Base API URL
     'base_uri' => env('MANUS_AI_BASE_URI', 'https://api.manus.ai'),
 
-    // Default agent profile: manus-1.5, manus-1.5-lite, speed, quality
-    'default_agent_profile' => env('MANUS_AI_DEFAULT_AGENT_PROFILE', 'manus-1.5'),
+    // Default agent profile: manus-1.6, manus-1.6-lite, manus-1.6-max, speed, quality
+    'default_agent_profile' => env('MANUS_AI_DEFAULT_AGENT_PROFILE', 'manus-1.6'),
 
     // Default task mode: chat, adaptive, agent
     'default_task_mode' => env('MANUS_AI_DEFAULT_TASK_MODE', 'agent'),
