@@ -1,4 +1,4 @@
-# Manus AI PHP SDK - Complete AI Agent Integration for PHP & Laravel
+# Manus AI PHP SDK
 
 <div align="center">
   <img src="https://github.com/user-attachments/assets/eb30d0e5-3d22-4edb-bb42-dd4e751b5cf4" alt="Manus AI PHP SDK" style="max-width: 100%; height: auto;">
@@ -6,43 +6,33 @@
 
 <div align="center">
 
-🚀 **The Ultimate PHP Library for Manus AI Integration** 🚀
-
-*Unlock the power of AI automation in your PHP applications with enterprise-grade reliability*
+**PHP SDK for [Manus AI](https://manus.ai) agent platform — works standalone or with Laravel**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![PHP Version](https://img.shields.io/badge/PHP-%5E8.2-blue)](https://www.php.net/)
 [![Laravel](https://img.shields.io/badge/Laravel-8%7C9%7C10%7C11%7C12-orange)](https://laravel.com/)
-[![Packagist Downloads](https://img.shields.io/packagist/dt/tigusigalpa/manus-ai-php)](https://packagist.org/packages/tigusigalpa/manus-ai-php)
 
 </div>
 
 ---
 
-## 🌟 Why Choose Manus AI PHP SDK?
+## Overview
 
-Welcome to the **most comprehensive and developer-friendly PHP SDK** for [Manus AI](https://manus.ai) - the cutting-edge
-AI agent platform that's revolutionizing workflow automation. Whether you're building intelligent chatbots, automating
-complex business processes, or creating AI-powered applications, this SDK provides everything you need to harness the
-full potential of Manus AI's advanced capabilities.
+A PHP SDK for the [Manus AI](https://manus.ai) platform. Covers the full API: task management, file uploads, webhooks. Includes Laravel service provider, facade, and Artisan commands out of the box.
 
-### 🎯 Perfect For:
+Built on PHP 8.2+ with type hints, tested with PHPUnit, follows PSR-4/PSR-12.
 
-- **🏢 Enterprise Applications**: Build scalable AI-powered solutions with robust error handling and type safety
-- **🤖 Chatbot Development**: Create intelligent conversational interfaces with context-aware responses
-- **📊 Data Analysis**: Automate document processing, report generation, and data extraction workflows
-- **🔄 Workflow Automation**: Streamline repetitive tasks with AI-driven automation
-- **💼 SaaS Platforms**: Integrate AI capabilities into your software-as-a-service products
-- **🎓 Educational Tools**: Develop AI-assisted learning and tutoring applications
-- **📱 Mobile Backends**: Power your mobile apps with intelligent server-side AI processing
+### Use cases
 
-### 💎 What Makes This SDK Special?
+- **Enterprise apps** — error handling, type safety, structured responses
+- **Chatbots** — conversational interfaces via the chat task mode
+- **Data processing** — document analysis, report generation, data extraction
+- **Workflow automation** — delegate repetitive tasks to the AI agent
+- **SaaS products** — embed AI features into your platform
+- **Education** — AI-assisted learning tools
+- **Mobile backends** — server-side AI processing for mobile apps
 
-This isn't just another API wrapper - it's a **production-ready, battle-tested solution** designed by developers, for
-developers. Built with modern PHP 8.2+ features, comprehensive Laravel integration, and an intuitive API that feels
-natural to use. Every method is documented, every edge case is handled, and every feature is tested.
-
-## 📋 Table of Contents
+## Table of Contents
 
 - [Features](#features)
 - [Requirements](#requirements)
@@ -60,72 +50,58 @@ natural to use. Every method is documented, every edge case is handled, and ever
 - [Contributing](#contributing)
 - [License](#license)
 
-## ✨ Powerful Features That Set You Apart
+## Features
 
-### 🎨 Core Capabilities
+### Core
 
-- ✅ **Complete Manus AI API Coverage**: Full implementation of all Manus AI endpoints with zero compromises
-- ✅ **Intelligent Task Management**: Create, monitor, update, and control AI agent tasks with granular control
-- ✅ **Advanced File Handling**: Seamless file upload, attachment management, and multi-format support (PDF, images,
-  documents)
-- ✅ **Real-Time Webhook Integration**: Stay synchronized with instant notifications for task lifecycle events
-- ✅ **Multi-Model Support**: Access to Manus 1.6, Lite, and Max variants for optimal performance/cost balance
+- Full Manus AI API coverage — all endpoints implemented
+- Task management — create, monitor, update, delete tasks
+- File handling — upload, attach (PDF, images, documents), manage
+- Webhooks — receive real-time notifications on task lifecycle events
+- Multi-model support — Manus 1.6, Lite, and Max
 
-### 🚀 Laravel Excellence
+### Laravel
 
-- ✅ **Native Laravel Integration**: First-class service provider, facade, and dependency injection support
-- ✅ **Powerful Artisan Commands**: Manage AI tasks directly from your terminal with intuitive CLI tools
-- ✅ **Configuration Publishing**: Customize every aspect through Laravel's familiar config system
-- ✅ **Environment-Based Setup**: Secure API key management through `.env` files
+- Service provider, facade, dependency injection
+- Artisan commands for task management
+- Config publishing via `vendor:publish`
+- API key management through `.env`
 
-### 🛡️ Enterprise-Grade Quality
+### Quality
 
-- ✅ **Comprehensive Error Handling**: Graceful failure management with detailed exception messages
-- ✅ **Type-Safe Architecture**: Full PHP 8.2+ type hints for IDE autocomplete and early error detection
-- ✅ **100% Test Coverage**: Extensive PHPUnit test suite ensuring reliability
-- ✅ **PSR-4 Autoloading**: Modern PHP standards compliance for seamless integration
-- ✅ **Production-Ready**: Battle-tested in real-world applications
+- Error handling with detailed exception messages
+- Full PHP 8.2+ type hints (IDE autocomplete, static analysis)
+- PHPUnit test suite
+- PSR-4 autoloading, PSR-12 code style
 
-### 📚 Developer Experience
+### Developer experience
 
-- ✅ **Extensive Documentation**: Every method documented with examples and use cases
-- ✅ **Working Code Examples**: Ready-to-run examples for common scenarios
-- ✅ **Helper Classes**: Convenient utilities for attachments, profiles, and webhook handling
-- ✅ **Intuitive API Design**: Methods that feel natural and follow PHP conventions
-- ✅ **Active Maintenance**: Regular updates and community support
+- Documented methods with examples
+- Ready-to-run example scripts
+- Helper classes for attachments, agent profiles, webhooks
 
-## 📦 Requirements
+## Requirements
 
 - PHP 8.2 or higher
 - Composer
 - Guzzle HTTP client (^7.8)
 - Laravel 8+ (optional, for Laravel integration)
 
-## 🔧 Installation & Quick Start
+## Installation
 
-### Step 1: Install via Composer
-
-Getting started is as simple as running a single command. The SDK is available on Packagist and can be installed in
-seconds:
+### 1. Install via Composer
 
 ```bash
 composer require tigusigalpa/manus-ai-php
 ```
 
-This will automatically install all required dependencies, including the Guzzle HTTP client for reliable API
-communication.
+### 2. Get your API key
 
-### Step 2: Get Your API Key
+1. Visit [Manus AI](https://manus.im) and create an account
+2. Go to [API Integration Settings](http://manus.im/app?show_settings=integrations&app_name=api)
+3. Copy your API key
 
-Before you can start creating AI-powered tasks, you'll need an API key from Manus AI:
-
-1. 🌐 Visit [Manus AI](https://manus.im) and create a free account
-2. 🔑 Navigate to [API Integration Settings](http://manus.im/app?show_settings=integrations&app_name=api)
-3. 📋 Copy your unique API key
-
-### Step 3: Quick Start (30 Seconds)
-
-Create your first AI task in just a few lines of code:
+### 3. Quick start
 
 ```php
 <?php
@@ -133,26 +109,19 @@ require 'vendor/autoload.php';
 
 use Tigusigalpa\ManusAI\ManusAIClient;
 
-// Initialize the client
 $client = new ManusAIClient('your-api-key-here');
 
-// Create your first AI task
 $result = $client->createTask('Write a creative story about a PHP developer who discovers AI');
 
-// Get the results
-echo "✅ Task Created Successfully!\n";
-echo "📋 Task ID: {$result['task_id']}\n";
-echo "🔗 View Task: {$result['task_url']}\n";
+echo "Task ID: {$result['task_id']}\n";
+echo "View Task: {$result['task_url']}\n";
 ```
 
-That's it! You're now ready to build powerful AI-driven applications. 🎉
+### Laravel quick start
 
-### For Laravel Users
-
-Laravel developers get even more convenience with automatic service provider registration:
+The service provider is registered automatically via package discovery:
 
 ```bash
-# Install the package
 composer require tigusigalpa/manus-ai-php
 
 # Add your API key to .env
@@ -162,14 +131,9 @@ echo "MANUS_AI_API_KEY=your-api-key-here" >> .env
 php artisan manus-ai:test
 ```
 
-## ⚙️ Configuration
+## Configuration
 
-### Getting Your API Key
-
-1. Sign up at [Manus AI](https://manus.im)
-2. Get your API key from the [API Integration settings](http://manus.im/app?show_settings=integrations&app_name=api)
-
-### PHP Configuration
+### PHP
 
 ```php
 use Tigusigalpa\ManusAI\ManusAIClient;
@@ -178,9 +142,9 @@ $apiKey = 'your-api-key-here';
 $client = new ManusAIClient($apiKey);
 ```
 
-### Laravel Configuration
+### Laravel
 
-#### 1. Publish Configuration (Optional)
+#### 1. Publish config (optional)
 
 ```bash
 php artisan vendor:publish --tag=manus-ai-config
@@ -194,11 +158,7 @@ MANUS_AI_DEFAULT_AGENT_PROFILE=manus-1.6
 MANUS_AI_DEFAULT_TASK_MODE=agent
 ```
 
-## 🚀 Usage
-
-This SDK provides a simple and intuitive interface to interact with Manus AI's powerful automation capabilities. Whether
-you're creating AI-powered tasks, managing file attachments, or setting up real-time notifications, the SDK handles all
-the complexity of API communication for you.
+## Usage
 
 ### Basic Usage
 
@@ -219,9 +179,7 @@ echo "View at: {$result['task_url']}\n";
 
 ### Task Management
 
-Tasks are the core of Manus AI - they represent AI agent work items that can perform complex operations, answer
-questions, or automate workflows. Each task has a lifecycle from creation through execution to completion, and you can
-monitor and control every step of the process.
+Tasks are the main entity in the Manus AI API. Each task goes through a lifecycle: creation → execution → completion.
 
 **API Documentation:** [Tasks API Reference](https://open.manus.ai/docs/api-reference/create-task)
 
@@ -312,9 +270,7 @@ echo "Deleted: " . ($result['deleted'] ? 'yes' : 'no') . "\n";
 
 ### File Management
 
-Manus AI supports file attachments to provide context for your tasks. The file upload process uses a two-step approach:
-first, create a file record to get a secure presigned URL, then upload your content directly to cloud storage. Once
-uploaded, files can be attached to tasks for analysis, processing, or reference.
+File uploads use a two-step process: create a file record to get a presigned URL, then upload content to that URL. After uploading, attach files to tasks.
 
 **API Documentation:** [Files API Reference](https://open.manus.ai/docs/api-reference/create-file)
 
@@ -384,15 +340,10 @@ $result = $client->deleteFile('file_id');
 
 ### Webhooks
 
-Webhooks enable real-time notifications about your task lifecycle events. Instead of polling for updates, Manus AI will
-send HTTP POST requests to your specified endpoint whenever important events occur - such as task creation or
-completion. This allows you to build reactive workflows, update dashboards instantly, or trigger automated actions based
-on task results.
+Instead of polling, Manus AI sends HTTP POST requests to your endpoint on task events:
 
-Manus AI supports two key event types:
-
-- **task_created**: Fired immediately when a task is created via the API
-- **task_stopped**: Fired when a task completes successfully or requires user input
+- **task_created** — fired when a task is created via the API
+- **task_stopped** — fired when a task completes or requires user input
 
 **API Documentation:** [Webhooks Guide](https://open.manus.ai/docs/webhooks/index)
 
@@ -447,9 +398,6 @@ $client->deleteWebhook('webhook_id');
 ```
 
 ### Laravel Integration
-
-The SDK includes first-class Laravel support with a service provider, facade, and Artisan commands. Once configured, you
-can use Manus AI seamlessly within your Laravel application through dependency injection or the convenient facade.
 
 #### Using Facade
 
@@ -513,7 +461,7 @@ php artisan manus-ai:task update --id=task_123 --title="New Title"
 php artisan manus-ai:task delete --id=task_123
 ```
 
-## 📚 API Reference
+## API Reference
 
 ### ManusAIClient Methods
 
@@ -569,13 +517,11 @@ php artisan manus-ai:task delete --id=task_123
 - `WebhookHandler::getTaskDetail(array $payload): ?array`
 - `WebhookHandler::getAttachments(array $payload): array`
 
-## 🎯 Real-World Use Cases & Success Stories
+## Examples by use case
 
-Discover how developers and businesses are leveraging Manus AI PHP SDK to transform their applications:
+### Content generation
 
-### 📝 Content Generation & Marketing
-
-**Automated Blog Post Creation**
+**Blog post creation**
 
 ```php
 $task = $client->createTask(
@@ -585,7 +531,7 @@ $task = $client->createTask(
 );
 ```
 
-**Social Media Management**
+**Social media posts**
 
 ```php
 $task = $client->createTask(
@@ -594,9 +540,9 @@ $task = $client->createTask(
 );
 ```
 
-### 📊 Business Intelligence & Data Analysis
+### Data analysis
 
-**Automated Report Generation**
+**Report generation**
 
 ```php
 // Upload sales data
@@ -611,7 +557,7 @@ $task = $client->createTask(
 );
 ```
 
-**Customer Feedback Analysis**
+**Feedback analysis**
 
 ```php
 $task = $client->createTask(
@@ -620,9 +566,9 @@ $task = $client->createTask(
 );
 ```
 
-### 🤖 Customer Support Automation
+### Customer support
 
-**Intelligent Ticket Response**
+**Ticket response**
 
 ```php
 // In your support ticket system
@@ -633,7 +579,7 @@ $task = ManusAI::createTask(
 );
 ```
 
-**FAQ Generation**
+**FAQ generation**
 
 ```php
 $task = $client->createTask(
@@ -642,7 +588,7 @@ $task = $client->createTask(
 );
 ```
 
-### � E-commerce & Product Management
+### E-commerce & Product Management
 
 **Product Description Writer**
 
@@ -662,9 +608,9 @@ $task = $client->createTask(
 );
 ```
 
-### 🎓 Education & E-Learning
+### Education
 
-**Quiz & Assessment Generator**
+**Quiz Generation**
 
 ```php
 $task = $client->createTask(
@@ -673,7 +619,7 @@ $task = $client->createTask(
 );
 ```
 
-**Personalized Learning Paths**
+**Learning Paths**
 
 ```php
 $task = $client->createTask(
@@ -682,9 +628,9 @@ $task = $client->createTask(
 );
 ```
 
-### 🔧 Development & Code Assistance
+### Development
 
-**Code Review & Documentation**
+**Code Review**
 
 ```php
 $fileResult = $client->createFile('legacy_code.php');
@@ -697,7 +643,7 @@ $task = $client->createTask(
 );
 ```
 
-**API Documentation Generator**
+**API Documentation**
 
 ```php
 $task = $client->createTask(
@@ -706,7 +652,7 @@ $task = $client->createTask(
 );
 ```
 
-### 🏥 Healthcare & Legal (Document Processing)
+### Document Processing
 
 **Medical Report Summarization**
 
@@ -728,9 +674,9 @@ $task = $client->createTask(
 );
 ```
 
-### 🌐 Multilingual Applications
+### Multilingual
 
-**Translation & Localization**
+**Translation**
 
 ```php
 $task = $client->createTask(
@@ -739,9 +685,9 @@ $task = $client->createTask(
 );
 ```
 
-### 📧 Email Marketing Automation
+### Email Campaigns
 
-**Campaign Creation**
+**Drip Campaign**
 
 ```php
 $task = $client->createTask(
@@ -751,7 +697,7 @@ $task = $client->createTask(
 );
 ```
 
-## �💡 Code Examples & Tutorials
+## Code Examples
 
 See the `examples/` directory for complete working examples:
 
@@ -762,11 +708,9 @@ See the `examples/` directory for complete working examples:
 - `advanced-workflows.php` - Complex multi-step AI workflows
 - `error-handling.php` - Comprehensive error handling patterns
 
-## 🧪 Testing & Quality Assurance
+## Testing
 
-### Running Tests
-
-We take code quality seriously. The SDK includes a comprehensive test suite covering all major functionality:
+### Running tests
 
 ```bash
 # Run all tests
@@ -779,9 +723,7 @@ composer test -- --verbose
 ./vendor/bin/phpunit tests/ManusAIClientTest.php
 ```
 
-### Code Coverage
-
-Generate detailed code coverage reports to ensure reliability:
+### Code coverage
 
 ```bash
 # Generate HTML coverage report
@@ -791,29 +733,24 @@ composer test-coverage
 composer test -- --coverage-text
 ```
 
-### Continuous Integration
-
-The SDK is tested against multiple PHP versions and Laravel versions to ensure compatibility:
+### CI matrix
 
 - PHP 8.2, 8.3, 8.4
 - Laravel 8.x, 9.x, 10.x, 11.x, 12.x
 - Multiple operating systems (Linux, macOS, Windows)
 
-## ❓ Frequently Asked Questions (FAQ)
+## FAQ
 
 ### General Questions
 
 **Q: Is this SDK free to use?**  
-A: Yes! The SDK is open-source and licensed under MIT. However, you'll need a Manus AI account and API key, which may
-have usage costs depending on your plan.
+A: The SDK is open-source (MIT). You'll need a Manus AI account and API key, which may have usage costs depending on your plan.
 
 **Q: What's the difference between this SDK and calling the API directly?**  
-A: This SDK provides type-safe interfaces, automatic error handling, helper classes, Laravel integration, and
-comprehensive documentation. It saves you hundreds of lines of boilerplate code.
+A: Type-safe interfaces, automatic error handling, helper classes, Laravel integration, and documentation. Saves a lot of boilerplate.
 
-**Q: Can I use this in production applications?**  
-A: Absolutely! The SDK is production-ready, battle-tested, and includes comprehensive error handling and logging
-capabilities.
+**Q: Can I use this in production?**  
+A: Yes. The SDK includes error handling and logging suitable for production use.
 
 **Q: Does this work with older PHP versions?**  
 A: The SDK requires PHP 8.2+ to take advantage of modern PHP features like typed properties, enums, and improved type
@@ -822,8 +759,7 @@ system.
 ### Laravel-Specific Questions
 
 **Q: Do I need Laravel to use this SDK?**  
-A: No! The SDK works perfectly in any PHP 8.2+ application. Laravel integration is optional but provides additional
-convenience features.
+A: No. The SDK works in any PHP 8.2+ application. Laravel integration is optional.
 
 **Q: How do I use this in Laravel Lumen?**  
 A: Register the service provider manually in `bootstrap/app.php`:
@@ -833,7 +769,7 @@ $app->register(Tigusigalpa\ManusAI\Laravel\ManusAIServiceProvider::class);
 ```
 
 **Q: Can I use multiple API keys in one Laravel application?**  
-A: Yes! Create multiple client instances with different API keys:
+A: Yes, create multiple client instances:
 
 ```php
 $client1 = new ManusAIClient('key-1');
@@ -883,7 +819,7 @@ A: Use the Lite model for simple tasks, batch similar requests, cache results wh
 to avoid unnecessary iterations.
 
 **Q: Can I process multiple tasks in parallel?**  
-A: Yes! Create multiple tasks asynchronously and use webhooks to get notified when each completes:
+A: Yes. Create multiple tasks and use webhooks to track completion:
 
 ```php
 $tasks = [];
@@ -895,22 +831,19 @@ foreach ($prompts as $prompt) {
 ### Integration Questions
 
 **Q: Can I integrate this with my existing CMS?**  
-A: Yes! The SDK is framework-agnostic and can be integrated into WordPress, Drupal, Joomla, or any PHP-based CMS.
+A: Yes. The SDK is framework-agnostic and works with WordPress, Drupal, Joomla, or any PHP-based CMS.
 
 **Q: Does this work with queued jobs?**  
-A: Absolutely! Perfect for Laravel queues:
+A: Yes. Works well with Laravel queues:
 
 ```php
 dispatch(new ProcessAITask($prompt));
 ```
 
 **Q: Can I use this in a REST API?**  
-A: Yes! The SDK is perfect for building AI-powered REST APIs. See the Laravel route examples for implementation
-patterns.
+A: Yes. See the Laravel route examples for implementation patterns.
 
-## 🔧 Troubleshooting Guide
-
-### Common Issues & Solutions
+## Troubleshooting
 
 #### Issue: "Invalid API Key" Error
 
@@ -1034,9 +967,7 @@ $client = new ManusAIClient('your-api-key', [
 ]);
 ```
 
-## ⚡ Performance & Best Practices
-
-### Optimizing Your AI Workflows
+## Performance & best practices
 
 #### 1. Choose the Right Model
 
@@ -1200,10 +1131,7 @@ public function handleWebhook(Request $request)
 }
 ```
 
-## 🤝 Contributing to the Project
-
-We love contributions! Whether you're fixing bugs, adding features, or improving documentation, your help makes this SDK
-better for everyone.
+## Contributing
 
 ### How to Contribute
 
@@ -1281,37 +1209,22 @@ Then open a Pull Request on GitHub with:
 - **Testing**: Maintain 100% code coverage for new features
 - **PSR-12**: Follow PHP-FIG coding standards
 
-#### What We're Looking For
-
-**🎯 High Priority:**
+#### What we're looking for
 
 - Bug fixes with test cases
 - Performance improvements
-- Documentation enhancements
+- Documentation improvements
 - New helper methods
 - Additional examples
-
-**💡 Feature Ideas:**
-
 - Streaming response support
-- Advanced caching strategies
-- Batch operation helpers
-- Additional Laravel integrations
 - Symfony bundle support
 
-**📚 Documentation:**
+#### Code review process
 
-- Tutorial articles
-- Video guides
-- Translation to other languages
-- Real-world case studies
-
-#### Code Review Process
-
-1. **Automated Checks**: CI/CD runs tests and code quality checks
-2. **Maintainer Review**: Core team reviews code and provides feedback
-3. **Iteration**: Address feedback and update PR
-4. **Merge**: Once approved, your contribution is merged!
+1. CI/CD runs tests and code quality checks
+2. Maintainer reviews code and provides feedback
+3. Address feedback, update PR
+4. Merge
 
 ### Development Setup
 
@@ -1351,202 +1264,90 @@ php examples/file-upload.php
 php examples/webhook.php
 ```
 
-### Community Guidelines
-
-- **Be Respectful**: Treat everyone with respect and kindness
-- **Be Constructive**: Provide helpful feedback and suggestions
-- **Be Patient**: Maintainers are volunteers with limited time
-- **Be Collaborative**: Work together to find the best solutions
-
-### Recognition
-
-Contributors are recognized in:
-
-- GitHub contributors page
-- Release notes
-- Project documentation
-- Special thanks section
-
 ### Questions?
 
-- 💬 Open a [Discussion](https://github.com/tigusigalpa/manus-ai-php/discussions)
-- 🐛 Report [Issues](https://github.com/tigusigalpa/manus-ai-php/issues)
-- 📧 Email: sovletig@gmail.com
+- [Discussions](https://github.com/tigusigalpa/manus-ai-php/discussions)
+- [Issues](https://github.com/tigusigalpa/manus-ai-php/issues)
+- Email: sovletig@gmail.com
 
-## 🗺️ Roadmap & Future Plans
+## Roadmap
 
-We're constantly improving the SDK based on community feedback and emerging AI capabilities. Here's what's on the
-horizon:
-
-### 🚀 Upcoming Features (v2.0)
+### v2.0 (planned)
 
 **Q1 2026:**
 
-- ✨ **Streaming Responses**: Real-time task output streaming for interactive applications
-- 🔄 **Async/Promise Support**: Non-blocking operations with ReactPHP integration
-- 📊 **Advanced Analytics**: Built-in usage tracking and cost optimization tools
-- 🎨 **Response Formatters**: Automatic parsing of JSON, Markdown, and structured outputs
+- Streaming responses
+- Async/Promise support (ReactPHP)
+- Usage tracking and analytics
+- Response formatters (JSON, Markdown, structured output)
 
 **Q2 2026:**
 
-- 🔌 **Symfony Bundle**: Native Symfony framework integration
-- 🌐 **WordPress Plugin**: Easy integration for WordPress developers
-- 📱 **Mobile SDK Companion**: Complementary mobile SDK documentation
-- 🧩 **Plugin System**: Extensible architecture for custom integrations
+- Symfony bundle
+- WordPress plugin
+- Plugin system for custom integrations
 
 **Q3 2026:**
 
-- 🤖 **AI Workflow Builder**: Visual workflow designer for complex AI pipelines
-- 📈 **Performance Dashboard**: Real-time monitoring and optimization insights
-- 🔐 **Enhanced Security**: OAuth support and advanced authentication options
-- 🌍 **Multi-Region Support**: Automatic region selection for optimal performance
+- Visual workflow builder
+- Performance dashboard
+- OAuth support
+- Multi-region support
 
-### 💡 Community Requests
-
-Vote on features you'd like to see:
+### Community requests
 
 - [ ] GraphQL API support
 - [ ] Batch file upload optimization
 - [ ] Custom model fine-tuning integration
-- [ ] Advanced prompt templates library
-- [ ] Integration with popular CMS platforms
+- [ ] Prompt templates library
+- [ ] CMS platform integrations
 - [ ] Docker container for local development
 
-**Want to influence the roadmap?** Open
-a [feature request](https://github.com/tigusigalpa/manus-ai-php/issues/new?template=feature_request.md) or vote on
-existing proposals!
+[Open a feature request](https://github.com/tigusigalpa/manus-ai-php/issues/new?template=feature_request.md) or vote on existing proposals.
 
-## 📊 Comparison with Alternatives
+## Comparison with direct API calls
 
-### Why Choose Manus AI PHP SDK?
+| Feature                | This SDK              | Direct API Calls |
+|------------------------|-----------------------|------------------|
+| **Type Safety**        | Full PHP 8.2+ types   | Manual           |
+| **Laravel Integration**| Built-in              | Manual           |
+| **Error Handling**     | Automatic             | Manual           |
+| **Helper Classes**     | Attachments, webhooks | None             |
+| **Test Coverage**      | PHPUnit suite         | N/A              |
+| **Webhook Helpers**    | Built-in              | Manual           |
 
-| Feature                  | Manus AI PHP SDK      | Direct API Calls | Other SDKs |
-|--------------------------|-----------------------|------------------|------------|
-| **Type Safety**          | ✅ Full PHP 8.2+ types | ❌ Manual typing  | ⚠️ Partial |
-| **Laravel Integration**  | ✅ Native support      | ❌ Manual setup   | ⚠️ Limited |
-| **Error Handling**       | ✅ Comprehensive       | ❌ Manual         | ⚠️ Basic   |
-| **Helper Classes**       | ✅ Rich utilities      | ❌ None           | ⚠️ Few     |
-| **Documentation**        | ✅ Extensive           | ⚠️ API docs only | ⚠️ Limited |
-| **Active Maintenance**   | ✅ Regular updates     | N/A              | ⚠️ Varies  |
-| **Test Coverage**        | ✅ 100%                | ❌ N/A            | ⚠️ Varies  |
-| **Community Support**    | ✅ Active              | ❌ None           | ⚠️ Limited |
-| **Examples & Tutorials** | ✅ Comprehensive       | ❌ None           | ⚠️ Basic   |
-| **Webhook Helpers**      | ✅ Built-in            | ❌ Manual         | ❌ None     |
+## License
 
-## 📄 License
+MIT License — see [LICENSE](LICENSE).
 
-This project is open-source and licensed under the **MIT License** - see the [LICENSE](LICENSE) file for complete
-details.
+## Links
 
-### What This Means For You
+- [Manus AI Website](https://manus.ai)
+- [API Documentation](https://open.manus.ai/docs)
+- [Get API Key](http://manus.im/app?show_settings=integrations&app_name=api)
+- [GitHub Repository](https://github.com/tigusigalpa/manus-ai-php)
+- [Packagist](https://packagist.org/packages/tigusigalpa/manus-ai-php)
+- [Issue Tracker](https://github.com/tigusigalpa/manus-ai-php/issues)
+- [Discussions](https://github.com/tigusigalpa/manus-ai-php/discussions)
+- [Changelog](https://github.com/tigusigalpa/manus-ai-php/blob/main/CHANGELOG.md)
 
-✅ **Commercial Use**: Use in commercial projects without restrictions  
-✅ **Modification**: Modify the code to fit your needs  
-✅ **Distribution**: Distribute your modified versions  
-✅ **Private Use**: Use privately without disclosure  
-✅ **No Warranty**: Provided "as-is" without warranty
+## Author
 
-## 🔗 Important Links & Resources
+**Igor Sazonov**
+- GitHub: [@tigusigalpa](https://github.com/tigusigalpa)
+- Email: sovletig@gmail.com
 
-### Official Resources
+## Acknowledgments
 
-- 🌐 [Manus AI Official Website](https://manus.ai) - Learn about Manus AI platform
-- 📖 [Manus AI API Documentation](https://open.manus.ai/docs) - Complete API reference
-- 🔑 [Get Your API Key](http://manus.im/app?show_settings=integrations&app_name=api) - Start building today
+- **Manus AI Team** — for the platform and API documentation
+- **Contributors** — pull requests, issues, and documentation improvements
 
-### SDK Resources
+### Built with
 
-- 💻 [GitHub Repository](https://github.com/tigusigalpa/manus-ai-php) - Source code and development
-- 📦 [Packagist Package](https://packagist.org/packages/tigusigalpa/manus-ai-php) - Composer installation
-- 🐛 [Issue Tracker](https://github.com/tigusigalpa/manus-ai-php/issues) - Report bugs and request features
-- 💬 [Discussions](https://github.com/tigusigalpa/manus-ai-php/discussions) - Community support and ideas
-- 📚 [Wiki](https://github.com/tigusigalpa/manus-ai-php/wiki) - Comprehensive guides and tutorials
-- 🔄 [Changelog](https://github.com/tigusigalpa/manus-ai-php/blob/main/CHANGELOG.md) - Version history
-
-**Connect:**
-
-- 🐙 GitHub: [@tigusigalpa](https://github.com/tigusigalpa)
-- 📧 Email: sovletig@gmail.com
-
-**Other Projects:**
-
-- 🚀 [CoinMarketCap PHP SDK](https://github.com/tigusigalpa/coinmarketcap-php)
-- 🔧 [More projects on GitHub](https://github.com/tigusigalpa)
-
-## 🙏 Acknowledgments & Credits
-
-### Special Thanks
-
-**Manus AI Team** - For creating an exceptional AI agent platform and providing excellent API documentation
-
-**PHP Community** - For continuous inspiration and best practices that shaped this SDK
-
-**Laravel Community** - For feedback on Laravel integration features
-
-**Early Adopters** - Developers who tested early versions and provided invaluable feedback
-
-**Contributors** - Everyone who submitted pull requests, reported issues, or improved documentation
-
-### Built With
-
-- 🐘 **PHP 8.2+** - Modern PHP features and performance
-- 🌐 **Guzzle HTTP** - Reliable HTTP client for API communication
-- 🎨 **Laravel** - Optional but powerful framework integration
-- 🧪 **PHPUnit** - Comprehensive testing framework
-- 📝 **PHPStan** - Static analysis for code quality
-- 🎯 **PHP-CS-Fixer** - Code style consistency
-
-### Inspired By
-
-This SDK follows best practices from leading PHP packages:
-
-- Laravel's elegant API design
-- Symfony's robust architecture
-- Guzzle's flexible HTTP handling
-- Stripe PHP's developer experience
-
-## 🚀 Start Building Today!
-
-Ready to transform your PHP applications with AI? Get started in 3 simple steps:
-
-```bash
-# 1. Install the SDK
-composer require tigusigalpa/manus-ai-php
-
-# 2. Set your API key
-export MANUS_AI_API_KEY="your-api-key-here"
-
-# 3. Create your first AI task
-php -r "require 'vendor/autoload.php'; 
-use Tigusigalpa\ManusAI\ManusAIClient;
-\$client = new ManusAIClient(getenv('MANUS_AI_API_KEY'));
-\$result = \$client->createTask('Hello, AI world!');
-echo 'Task created: ' . \$result['task_url'] . PHP_EOL;"
-```
-
-### Join Our Growing Community
-
-- ⭐ **Star the repo** on GitHub to show your support
-- 🔔 **Watch for updates** to stay informed about new features
-- 🤝 **Contribute** to make the SDK even better
-- 📢 **Share** with fellow PHP developers
-
----
-
-<div align="center">
-
-*Empowering PHP developers to build intelligent applications*
-
-[⬆ Back to Top](#manus-ai-php-sdk---complete-ai-agent-integration-for-php--laravel)
-
-</div>
-
----
-
-### Keywords for SEO
-
-PHP AI SDK, Manus AI PHP, Laravel AI integration, PHP artificial intelligence, AI agent PHP, PHP machine learning, AI
-automation PHP, PHP chatbot SDK, Laravel AI package, PHP AI library, Manus AI wrapper, PHP AI API, intelligent PHP
-applications, AI-powered PHP, PHP AI development, Laravel AI tools, PHP AI framework, automated AI tasks PHP, PHP AI
-integration, Laravel machine learning
+- PHP 8.2+
+- Guzzle HTTP
+- Laravel (optional)
+- PHPUnit
+- PHPStan
+- PHP-CS-Fixer
 
