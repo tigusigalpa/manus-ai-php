@@ -6,7 +6,7 @@
 
 <div align="center">
 
-**PHP SDK for [Manus AI](https://manus.ai) agent platform — works standalone or with Laravel**
+**PHP SDK for [Manus AI](https://manus.ai) API v2 — works standalone or with Laravel**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![PHP Version](https://img.shields.io/badge/PHP-%5E8.2-blue)](https://www.php.net/)
@@ -16,9 +16,11 @@
 
 ---
 
+> **⚠️ Breaking Changes:** Version 2.0+ uses Manus API v2 with significant changes. See [Migration Guide](#migration-from-v1) below.
+
 ## Overview
 
-A PHP SDK for the [Manus AI](https://manus.ai) platform. Covers the full API: task management, file uploads, webhooks. Includes Laravel service provider, facade, and Artisan commands out of the box.
+A PHP SDK for the [Manus AI](https://manus.ai) platform API v2. Covers the full API: task management, multi-turn conversations, file uploads, webhooks, projects, skills, and connectors. Includes Laravel service provider, facade, and Artisan commands out of the box.
 
 Built on PHP 8.2+ with type hints, tested with PHPUnit, follows PSR-4/PSR-12.
 
@@ -54,11 +56,25 @@ Built on PHP 8.2+ with type hints, tested with PHPUnit, follows PSR-4/PSR-12.
 
 ### Core
 
-- Full Manus AI API coverage — all endpoints implemented
-- Task management — create, monitor, update, delete tasks
-- File handling — upload, attach (PDF, images, documents), manage
+- **Full Manus AI API v2 coverage** — all endpoints implemented
+- Task management — create, monitor, update, delete tasks with new message format
+- **Multi-turn conversations** — `sendMessage()` for interactive dialogues
+- **Task lifecycle** — `listMessages()` to poll progress, `stopTask()`, `confirmAction()`
+- File handling — upload, attach (file_id, file_url, file_data), manage
 - Webhooks — receive real-time notifications on task lifecycle events
+- **Projects & Skills** — group tasks, enable specific skills
+- **Connectors** — integrate external services
 - Multi-model support — Manus 1.6, Lite, and Max
+
+### New in v2
+
+- **Message-based API**: Structured content format for tasks
+- **Task polling**: Track progress with event messages
+- **Interactive tasks**: Confirm actions when agent needs approval
+- **Enhanced metadata**: `agent_status`, `share_visibility`, Unix timestamps
+- **Cursor pagination**: Efficient pagination for tasks and files
+- **Skills & Connectors**: Per-task configuration
+- **Projects**: Organize related tasks
 
 ### Laravel
 
@@ -1323,13 +1339,96 @@ MIT License — see [LICENSE](LICENSE).
 ## Links
 
 - [Manus AI Website](https://manus.ai)
-- [API Documentation](https://open.manus.ai/docs)
+- [API v2 Documentation](https://open.manus.im/docs/v2/introduction)
 - [Get API Key](http://manus.im/app?show_settings=integrations&app_name=api)
 - [GitHub Repository](https://github.com/tigusigalpa/manus-ai-php)
 - [Packagist](https://packagist.org/packages/tigusigalpa/manus-ai-php)
 - [Issue Tracker](https://github.com/tigusigalpa/manus-ai-php/issues)
 - [Discussions](https://github.com/tigusigalpa/manus-ai-php/discussions)
 - [Changelog](https://github.com/tigusigalpa/manus-ai-php/blob/main/CHANGELOG.md)
+
+## Migration from v1
+
+### Breaking Changes
+
+1. **API Endpoints**: All endpoints changed from `/v1/` to `/v2/` with new naming (e.g., `/v2/task.create`)
+
+2. **Authentication Header**: Changed from `Authorization` to `x-manus-api-key`
+
+3. **Request Structure**: Tasks now use message-based format:
+   ```php
+   // v1
+   $client->createTask('Hello', [
+       'agentProfile' => 'manus-1.6',
+       'taskMode' => 'agent',
+   ]);
+   
+   // v2
+   $client->createTask('Hello', [
+       'agent_profile' => 'manus-1.6',
+       'share_visibility' => 'private',
+   ]);
+   ```
+
+4. **Response Format**: All responses now include `ok` and `request_id` fields
+
+5. **Field Names**: Snake_case preferred (both camelCase and snake_case supported for backward compatibility):
+   - `agentProfile` → `agent_profile`
+   - `hideInTaskList` → `hide_in_task_list`
+   - `createShareableLink` → `share_visibility`
+
+6. **Response Keys**: Changed field names in responses:
+   - `status` → `agent_status`
+   - `data` → `tasks` (in list responses)
+   - `id` → `file_id` (for files)
+
+7. **Timestamps**: Changed from ISO strings to Unix milliseconds (integers)
+
+8. **Attachments**: New structure with `file_id`, `file_url`, `file_data`
+
+9. **Removed Fields**:
+   - `taskMode` (no longer needed)
+   - `createShareableLink` (replaced by `share_visibility`)
+
+10. **New Methods**:
+    - `listMessages()` - Poll task progress
+    - `sendMessage()` - Continue conversations
+    - `stopTask()` - Stop running tasks
+    - `confirmAction()` - Confirm pending actions
+
+### Migration Example
+
+```php
+// v1
+$task = $client->createTask('Hello', [
+    'agentProfile' => 'manus-1.6',
+    'taskMode' => 'agent',
+]);
+
+// v2
+$task = $client->createTask('Hello', [
+    'agent_profile' => 'manus-1.6',
+    'share_visibility' => 'private',
+]);
+
+// v2: Poll for progress
+$messages = $client->listMessages($task['task_id']);
+
+// v2: Continue conversation
+$client->sendMessage($task['task_id'], 'Tell me more');
+```
+
+### Backward Compatibility
+
+The SDK accepts both camelCase and snake_case for input parameters:
+
+```php
+// Both work
+$client->createTask('Hello', ['agentProfile' => 'manus-1.6']);
+$client->createTask('Hello', ['agent_profile' => 'manus-1.6']);
+```
+
+However, **response keys use the new v2 format** (snake_case and new field names).
 
 ## Author
 

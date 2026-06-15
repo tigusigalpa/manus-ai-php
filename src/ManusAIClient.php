@@ -39,12 +39,82 @@ class ManusAIClient implements ManusAIClientInterface
             throw new ValidationException('Task prompt cannot be empty');
         }
 
-        $payload = array_merge([
-            'prompt' => $prompt,
-            'agentProfile' => 'manus-1.6',
-        ], $options);
+        $message = [
+            'content' => [
+                [
+                    'type' => 'text',
+                    'text' => $prompt,
+                ],
+            ],
+        ];
 
-        return $this->request('POST', '/v1/tasks', $payload);
+        $payload = [
+            'message' => $message,
+        ];
+
+        if (isset($options['agent_profile'])) {
+            $payload['agent_profile'] = $options['agent_profile'];
+        } elseif (isset($options['agentProfile'])) {
+            $payload['agent_profile'] = $options['agentProfile'];
+        }
+
+        if (isset($options['locale'])) {
+            $payload['locale'] = $options['locale'];
+        }
+
+        if (isset($options['hide_in_task_list'])) {
+            $payload['hide_in_task_list'] = $options['hide_in_task_list'];
+        } elseif (isset($options['hideInTaskList'])) {
+            $payload['hide_in_task_list'] = $options['hideInTaskList'];
+        }
+
+        if (isset($options['share_visibility'])) {
+            $payload['share_visibility'] = $options['share_visibility'];
+        } elseif (isset($options['shareVisibility'])) {
+            $payload['share_visibility'] = $options['shareVisibility'];
+        }
+
+        if (isset($options['title'])) {
+            $payload['title'] = $options['title'];
+        }
+
+        if (isset($options['project_id'])) {
+            $payload['project_id'] = $options['project_id'];
+        } elseif (isset($options['projectId'])) {
+            $payload['project_id'] = $options['projectId'];
+        }
+
+        if (isset($options['enable_ask_user'])) {
+            $payload['enable_ask_user'] = $options['enable_ask_user'];
+        } elseif (isset($options['enableAskUser'])) {
+            $payload['enable_ask_user'] = $options['enableAskUser'];
+        }
+
+        if (isset($options['connectors'])) {
+            $message['connectors'] = $options['connectors'];
+        }
+
+        if (isset($options['enable_skills'])) {
+            $message['enable_skills'] = $options['enable_skills'];
+        } elseif (isset($options['enableSkills'])) {
+            $message['enable_skills'] = $options['enableSkills'];
+        }
+
+        if (isset($options['force_skills'])) {
+            $message['force_skills'] = $options['force_skills'];
+        } elseif (isset($options['forceSkills'])) {
+            $message['force_skills'] = $options['forceSkills'];
+        }
+
+        if (isset($options['attachments']) && is_array($options['attachments'])) {
+            foreach ($options['attachments'] as $attachment) {
+                $message['content'][] = $attachment;
+            }
+        }
+
+        $payload['message'] = $message;
+
+        return $this->request('POST', '/v2/task.create', $payload);
     }
 
     /**
@@ -54,19 +124,15 @@ class ManusAIClient implements ManusAIClientInterface
     {
         $query = [];
         
-        $allowedFilters = ['after', 'limit', 'order', 'orderBy', 'query', 'status', 'createdAfter', 'createdBefore'];
+        $allowedFilters = ['cursor', 'limit', 'order', 'scope', 'agent_id', 'project_id'];
         
         foreach ($allowedFilters as $filter) {
             if (isset($filters[$filter])) {
-                if ($filter === 'status' && is_array($filters[$filter])) {
-                    $query[$filter] = $filters[$filter];
-                } else {
-                    $query[$filter] = $filters[$filter];
-                }
+                $query[$filter] = $filters[$filter];
             }
         }
 
-        return $this->request('GET', '/v1/tasks', null, $query);
+        return $this->request('GET', '/v2/task.list', null, $query);
     }
 
     /**
@@ -78,7 +144,7 @@ class ManusAIClient implements ManusAIClientInterface
             throw new ValidationException('Task ID cannot be empty');
         }
 
-        return $this->request('GET', "/v1/tasks/{$taskId}");
+        return $this->request('GET', '/v2/task.detail', null, ['task_id' => $taskId]);
     }
 
     /**
@@ -94,14 +160,35 @@ class ManusAIClient implements ManusAIClientInterface
             throw new ValidationException('Updates array cannot be empty');
         }
 
-        $allowedFields = ['title', 'enableShared', 'enableVisibleInTaskList'];
-        $payload = array_intersect_key($updates, array_flip($allowedFields));
+        $payload = ['task_id' => $taskId];
+        $hasUpdates = false;
 
-        if (empty($payload)) {
+        if (isset($updates['title'])) {
+            $payload['title'] = $updates['title'];
+            $hasUpdates = true;
+        }
+
+        if (isset($updates['share_visibility'])) {
+            $payload['share_visibility'] = $updates['share_visibility'];
+            $hasUpdates = true;
+        } elseif (isset($updates['shareVisibility'])) {
+            $payload['share_visibility'] = $updates['shareVisibility'];
+            $hasUpdates = true;
+        }
+
+        if (isset($updates['hide_in_task_list'])) {
+            $payload['hide_in_task_list'] = $updates['hide_in_task_list'];
+            $hasUpdates = true;
+        } elseif (isset($updates['hideInTaskList'])) {
+            $payload['hide_in_task_list'] = $updates['hideInTaskList'];
+            $hasUpdates = true;
+        }
+
+        if (!$hasUpdates) {
             throw new ValidationException('No valid update fields provided');
         }
 
-        return $this->request('PATCH', "/v1/tasks/{$taskId}", $payload);
+        return $this->request('POST', '/v2/task.update', $payload);
     }
 
     /**
@@ -113,7 +200,7 @@ class ManusAIClient implements ManusAIClientInterface
             throw new ValidationException('Task ID cannot be empty');
         }
 
-        return $this->request('DELETE', "/v1/tasks/{$taskId}");
+        return $this->request('POST', '/v2/task.delete', ['task_id' => $taskId]);
     }
 
     /**
@@ -125,7 +212,7 @@ class ManusAIClient implements ManusAIClientInterface
             throw new ValidationException('Filename cannot be empty');
         }
 
-        return $this->request('POST', '/v1/files', ['filename' => $filename]);
+        return $this->request('POST', '/v2/file.upload', ['filename' => $filename]);
     }
 
     /**
@@ -158,9 +245,17 @@ class ManusAIClient implements ManusAIClientInterface
     /**
      * List files (returns 10 most recent)
      */
-    public function listFiles(): array
+    public function listFiles(int $limit = 0, string $cursor = ''): array
     {
-        return $this->request('GET', '/v1/files');
+        $query = [];
+        if ($limit > 0) {
+            $query['limit'] = $limit;
+        }
+        if (!empty($cursor)) {
+            $query['cursor'] = $cursor;
+        }
+
+        return $this->request('GET', '/v2/file.list', null, $query);
     }
 
     /**
@@ -172,7 +267,7 @@ class ManusAIClient implements ManusAIClientInterface
             throw new ValidationException('File ID cannot be empty');
         }
 
-        return $this->request('GET', "/v1/files/{$fileId}");
+        return $this->request('GET', '/v2/file.detail', null, ['file_id' => $fileId]);
     }
 
     /**
@@ -184,7 +279,7 @@ class ManusAIClient implements ManusAIClientInterface
             throw new ValidationException('File ID cannot be empty');
         }
 
-        return $this->request('DELETE', "/v1/files/{$fileId}");
+        return $this->request('POST', '/v2/file.delete', ['file_id' => $fileId]);
     }
 
     /**
@@ -200,7 +295,12 @@ class ManusAIClient implements ManusAIClientInterface
             throw new ValidationException('Webhook URL is required');
         }
 
-        return $this->request('POST', '/v1/webhooks', ['webhook' => $webhook]);
+        $payload = [
+            'url' => $webhook['url'],
+            'events' => $webhook['events'] ?? [],
+        ];
+
+        return $this->request('POST', '/v2/webhook.create', $payload);
     }
 
     /**
@@ -212,8 +312,103 @@ class ManusAIClient implements ManusAIClientInterface
             throw new ValidationException('Webhook ID cannot be empty');
         }
 
-        $this->request('DELETE', "/v1/webhooks/{$webhookId}");
+        $this->request('POST', '/v2/webhook.delete', ['webhook_id' => $webhookId]);
         return true;
+    }
+
+    /**
+     * List messages for a task
+     */
+    public function listMessages(string $taskId, int $limit = 50, string $cursor = '', string $order = 'desc', bool $verbose = false): array
+    {
+        if (empty(trim($taskId))) {
+            throw new ValidationException('Task ID cannot be empty');
+        }
+
+        $query = ['task_id' => $taskId];
+        
+        if ($limit > 0) {
+            $query['limit'] = $limit;
+        }
+        if (!empty($cursor)) {
+            $query['cursor'] = $cursor;
+        }
+        if (!empty($order)) {
+            $query['order'] = $order;
+        }
+        if ($verbose) {
+            $query['verbose'] = 'true';
+        }
+
+        return $this->request('GET', '/v2/task.listMessages', null, $query);
+    }
+
+    /**
+     * Send a message to a task
+     */
+    public function sendMessage(string $taskId, string $message, array $attachments = []): array
+    {
+        if (empty(trim($taskId))) {
+            throw new ValidationException('Task ID cannot be empty');
+        }
+        if (empty(trim($message))) {
+            throw new ValidationException('Message cannot be empty');
+        }
+
+        $content = [
+            [
+                'type' => 'text',
+                'text' => $message,
+            ],
+        ];
+
+        if (!empty($attachments)) {
+            foreach ($attachments as $attachment) {
+                $content[] = $attachment;
+            }
+        }
+
+        $payload = [
+            'task_id' => $taskId,
+            'message' => [
+                'content' => $content,
+            ],
+        ];
+
+        return $this->request('POST', '/v2/task.sendMessage', $payload);
+    }
+
+    /**
+     * Stop a running task
+     */
+    public function stopTask(string $taskId): array
+    {
+        if (empty(trim($taskId))) {
+            throw new ValidationException('Task ID cannot be empty');
+        }
+
+        return $this->request('POST', '/v2/task.stop', ['task_id' => $taskId]);
+    }
+
+    /**
+     * Confirm an action waiting for user input
+     */
+    public function confirmAction(string $taskId, string $eventId, array $input): array
+    {
+        if (empty(trim($taskId))) {
+            throw new ValidationException('Task ID cannot be empty');
+        }
+        if (empty(trim($eventId))) {
+            throw new ValidationException('Event ID cannot be empty');
+        }
+
+        $payload = [
+            'task_id' => $taskId,
+            'event_id' => $eventId,
+            'input' => $input,
+        ];
+
+        return $this->request('POST', '/v2/task.confirmAction', $payload);
     }
 
     /**
@@ -231,7 +426,7 @@ class ManusAIClient implements ManusAIClientInterface
         try {
             $options = [
                 'headers' => [
-                    'Authorization' => $this->apiKey,
+                    'x-manus-api-key' => $this->apiKey,
                     'Content-Type' => 'application/json',
                     'Accept' => 'application/json',
                 ],

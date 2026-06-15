@@ -13,7 +13,7 @@ class TaskAttachment
     public static function fromFileId(string $fileId): array
     {
         return [
-            'type' => 'file_id',
+            'type' => 'file',
             'file_id' => $fileId,
         ];
     }
@@ -27,8 +27,8 @@ class TaskAttachment
     public static function fromUrl(string $url): array
     {
         return [
-            'type' => 'url',
-            'url' => $url,
+            'type' => 'file',
+            'file_url' => $url,
         ];
     }
 
@@ -42,8 +42,8 @@ class TaskAttachment
     public static function fromBase64(string $base64Data, string $mimeType): array
     {
         return [
-            'type' => 'data',
-            'data' => $base64Data,
+            'type' => 'file',
+            'file_data' => $base64Data,
             'mime_type' => $mimeType,
         ];
     }

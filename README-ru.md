@@ -6,7 +6,7 @@
 
 <div align="center">
 
-**PHP SDK для платформы [Manus AI](https://manus.ai) — работает автономно или с Laravel**
+**PHP SDK для API v2 [Manus AI](https://manus.ai) — работает автономно или с Laravel**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![PHP Version](https://img.shields.io/badge/PHP-%5E8.2-blue)](https://www.php.net/)
@@ -18,9 +18,11 @@
 
 ---
 
+> **⚠️ Критические изменения:** Версия 2.0+ использует Manus API v2 со значительными изменениями. См. [Руководство по миграции](#миграция-с-v1) ниже.
+
 ## Обзор
 
-PHP SDK для платформы [Manus AI](https://manus.ai). Покрывает весь API: управление задачами, загрузка файлов, вебхуки. Включает Laravel service provider, facade и Artisan-команды.
+PHP SDK для платформы [Manus AI](https://manus.ai) API v2. Покрывает весь API: управление задачами, мультитёрн диалоги, загрузка файлов, вебхуки, проекты, навыки и коннекторы. Включает Laravel service provider, facade и Artisan-команды.
 
 Построен на PHP 8.2+ с type hints, протестирован PHPUnit, соответствует PSR-4/PSR-12.
 
@@ -54,11 +56,25 @@ PHP SDK для платформы [Manus AI](https://manus.ai). Покрывае
 
 ### Основное
 
-- Полное покрытие API Manus AI — все эндпоинты реализованы
-- Управление задачами — создание, мониторинг, обновление, удаление
-- Работа с файлами — загрузка, вложения (PDF, изображения, документы)
+- **Полное покрытие API v2 Manus AI** — все эндпоинты реализованы
+- Управление задачами — создание, мониторинг, обновление, удаление с новым форматом сообщений
+- **Мультитёрн диалоги** — `sendMessage()` для интерактивных бесед
+- **Жизненный цикл задач** — `listMessages()` для отслеживания прогресса, `stopTask()`, `confirmAction()`
+- Работа с файлами — загрузка, вложения (file_id, file_url, file_data)
 - Вебхуки — уведомления о событиях жизненного цикла задач
+- **Проекты и навыки** — группировка задач, включение конкретных навыков
+- **Коннекторы** — интеграция внешних сервисов
 - Несколько моделей — Manus 1.6, Lite и Max
+
+### Новое в v2
+
+- **Message-based API**: Структурированный формат контента для задач
+- **Polling задач**: Отслеживание прогресса через события сообщений
+- **Интерактивные задачи**: Подтверждение действий, когда агенту нужно одобрение
+- **Расширенные метаданные**: `agent_status`, `share_visibility`, Unix временные метки
+- **Cursor-пагинация**: Эффективная пагинация для задач и файлов
+- **Навыки и коннекторы**: Настройка для каждой задачи
+- **Проекты**: Организация связанных задач
 
 ### Laravel
 
@@ -181,21 +197,36 @@ echo "Просмотреть по адресу: {$result['task_url']}\n";
 
 Задачи — основная сущность в API Manus AI. Жизненный цикл задачи: создание → выполнение → завершение.
 
-**Документация API:** [Справочник API задач](https://open.manus.ai/docs/api-reference/create-task)
+**Документация API:** [Справочник API v2 задач](https://open.manus.im/docs/v2/task.create)
 
 #### Создание задачи
 
-[Документация API: Создание задачи](https://open.manus.ai/docs/api-reference/create-task)
+[Документация API: Создание задачи](https://open.manus.im/docs/v2/task.create)
 
 ```php
 use Tigusigalpa\ManusAI\Helpers\AgentProfile;
 
 $task = $client->createTask('Ваш запрос здесь', [
-    'agentProfile' => AgentProfile::MANUS_1_6,  // или AgentProfile::MANUS_1_6_LITE, MANUS_1_6_MAX
-    'taskMode' => 'agent',                       // 'chat', 'adaptive', или 'agent'
+    'agent_profile' => AgentProfile::MANUS_1_6,  // или AgentProfile::MANUS_1_6_LITE, MANUS_1_6_MAX
     'locale' => 'ru-RU',
-    'hideInTaskList' => false,
-    'createShareableLink' => true,
+    'hide_in_task_list' => false,
+    'share_visibility' => 'private',  // 'private', 'team', или 'public'
+    'title' => 'Моя задача',
+    'project_id' => 'proj_123',
+    'enable_ask_user' => true,
+]);
+
+echo "ID задачи: {$task['task_id']}\n";
+echo "URL задачи: {$task['task_url']}\n";
+```
+
+#### Создание задачи с навыками и коннекторами
+
+```php
+$task = $client->createTask('Найди последние новости об AI', [
+    'agent_profile' => AgentProfile::MANUS_1_6,
+    'connectors' => ['conn_google', 'conn_twitter'],
+    'enable_skills' => ['skill_web_search', 'skill_summarize'],
 ]);
 ```
 
@@ -395,6 +426,89 @@ composer test
 
 MIT License. См. [LICENSE](LICENSE) для деталей.
 
+## Миграция с v1
+
+### Критические изменения
+
+1. **API Endpoints**: Все endpoints изменены с `/v1/` на `/v2/` с новыми названиями (например, `/v2/task.create`)
+
+2. **Заголовок аутентификации**: Изменён с `Authorization` на `x-manus-api-key`
+
+3. **Структура запросов**: Задачи теперь используют формат сообщений:
+   ```php
+   // v1
+   $client->createTask('Привет', [
+       'agentProfile' => 'manus-1.6',
+       'taskMode' => 'agent',
+   ]);
+   
+   // v2
+   $client->createTask('Привет', [
+       'agent_profile' => 'manus-1.6',
+       'share_visibility' => 'private',
+   ]);
+   ```
+
+4. **Формат ответов**: Все ответы теперь включают поля `ok` и `request_id`
+
+5. **Названия полей**: Предпочтителен snake_case (поддерживаются оба формата для обратной совместимости):
+   - `agentProfile` → `agent_profile`
+   - `hideInTaskList` → `hide_in_task_list`
+   - `createShareableLink` → `share_visibility`
+
+6. **Ключи в ответах**: Изменённые названия полей:
+   - `status` → `agent_status`
+   - `data` → `tasks` (в списках)
+   - `id` → `file_id` (для файлов)
+
+7. **Временные метки**: Изменены с ISO строк на Unix миллисекунды (целые числа)
+
+8. **Вложения**: Новая структура с `file_id`, `file_url`, `file_data`
+
+9. **Удалённые поля**:
+   - `taskMode` (больше не нужен)
+   - `createShareableLink` (заменён на `share_visibility`)
+
+10. **Новые методы**:
+    - `listMessages()` - Отслеживание прогресса задачи
+    - `sendMessage()` - Продолжение диалогов
+    - `stopTask()` - Остановка выполняющихся задач
+    - `confirmAction()` - Подтверждение ожидающих действий
+
+### Пример миграции
+
+```php
+// v1
+$task = $client->createTask('Привет', [
+    'agentProfile' => 'manus-1.6',
+    'taskMode' => 'agent',
+]);
+
+// v2
+$task = $client->createTask('Привет', [
+    'agent_profile' => 'manus-1.6',
+    'share_visibility' => 'private',
+]);
+
+// v2: Отслеживание прогресса
+$messages = $client->listMessages($task['task_id']);
+
+// v2: Продолжение диалога
+$client->sendMessage($task['task_id'], 'Расскажи подробнее');
+```
+
+### Обратная совместимость
+
+SDK принимает оба формата для входных параметров:
+
+```php
+// Оба варианта работают
+$client->createTask('Привет', ['agentProfile' => 'manus-1.6']);
+$client->createTask('Привет', ['agent_profile' => 'manus-1.6']);
+```
+
+Однако, **ключи в ответах используют новый формат v2** (snake_case и новые названия полей).
+
 ## Автор
 
 **Igor Sazonov**
@@ -404,9 +518,9 @@ MIT License. См. [LICENSE](LICENSE) для деталей.
 ## Ссылки
 
 - [Сайт Manus AI](https://manus.ai)
-- [Документация API](https://open.manus.ai/docs)
+- [Документация API v2](https://open.manus.im/docs/v2/introduction)
 - [GitHub репозиторий](https://github.com/tigusigalpa/manus-ai-php)
 
 ---
 
-Автор: [Igor Sazonov](https://github.com/tigusigalpa)
+Также см. Go SDK: [manus-ai-go](https://github.com/tigusigalpa/manus-ai-go)
