@@ -1,8 +1,6 @@
 # Manus AI PHP SDK
 
-<div align="center">
-  <img src="https://github.com/user-attachments/assets/eb30d0e5-3d22-4edb-bb42-dd4e751b5cf4" alt="Manus AI PHP SDK" style="max-width: 100%; height: auto;">
-</div>
+![Manus AI PHP SDK](https://i.postimg.cc/pL6TLYCt/manus-ai-api-php-sdk.png)
 
 <div align="center">
 
@@ -16,11 +14,14 @@
 
 ---
 
-> **⚠️ Breaking Changes:** Version 2.0+ uses Manus API v2 with significant changes. See [Migration Guide](#migration-from-v1) below.
+> **⚠️ Breaking Changes:** Version 2.0+ uses Manus API v2 with significant changes.
+> See [Migration Guide](#migration-from-v1) below.
 
 ## Overview
 
-A PHP SDK for the [Manus AI](https://manus.ai) platform API v2. Covers the full API: task management, multi-turn conversations, file uploads, webhooks, projects, skills, and connectors. Includes Laravel service provider, facade, and Artisan commands out of the box.
+A PHP SDK for the [Manus AI](https://manus.ai) platform API v2. Covers the full API: task management, multi-turn
+conversations, file uploads, webhooks, projects, skills, and connectors. Includes Laravel service provider, facade, and
+Artisan commands out of the box.
 
 Built on PHP 8.2+ with type hints, tested with PHPUnit, follows PSR-4/PSR-12.
 
@@ -286,7 +287,8 @@ echo "Deleted: " . ($result['deleted'] ? 'yes' : 'no') . "\n";
 
 ### File Management
 
-File uploads use a two-step process: create a file record to get a presigned URL, then upload content to that URL. After uploading, attach files to tasks.
+File uploads use a two-step process: create a file record to get a presigned URL, then upload content to that URL. After
+uploading, attach files to tasks.
 
 **API Documentation:** [Files API Reference](https://open.manus.ai/docs/api-reference/create-file)
 
@@ -760,10 +762,12 @@ composer test -- --coverage-text
 ### General Questions
 
 **Q: Is this SDK free to use?**  
-A: The SDK is open-source (MIT). You'll need a Manus AI account and API key, which may have usage costs depending on your plan.
+A: The SDK is open-source (MIT). You'll need a Manus AI account and API key, which may have usage costs depending on
+your plan.
 
 **Q: What's the difference between this SDK and calling the API directly?**  
-A: Type-safe interfaces, automatic error handling, helper classes, Laravel integration, and documentation. Saves a lot of boilerplate.
+A: Type-safe interfaces, automatic error handling, helper classes, Laravel integration, and documentation. Saves a lot
+of boilerplate.
 
 **Q: Can I use this in production?**  
 A: Yes. The SDK includes error handling and logging suitable for production use.
@@ -1319,18 +1323,19 @@ php examples/webhook.php
 - [ ] CMS platform integrations
 - [ ] Docker container for local development
 
-[Open a feature request](https://github.com/tigusigalpa/manus-ai-php/issues/new?template=feature_request.md) or vote on existing proposals.
+[Open a feature request](https://github.com/tigusigalpa/manus-ai-php/issues/new?template=feature_request.md) or vote on
+existing proposals.
 
 ## Comparison with direct API calls
 
-| Feature                | This SDK              | Direct API Calls |
-|------------------------|-----------------------|------------------|
-| **Type Safety**        | Full PHP 8.2+ types   | Manual           |
-| **Laravel Integration**| Built-in              | Manual           |
-| **Error Handling**     | Automatic             | Manual           |
-| **Helper Classes**     | Attachments, webhooks | None             |
-| **Test Coverage**      | PHPUnit suite         | N/A              |
-| **Webhook Helpers**    | Built-in              | Manual           |
+| Feature                 | This SDK              | Direct API Calls |
+|-------------------------|-----------------------|------------------|
+| **Type Safety**         | Full PHP 8.2+ types   | Manual           |
+| **Laravel Integration** | Built-in              | Manual           |
+| **Error Handling**      | Automatic             | Manual           |
+| **Helper Classes**      | Attachments, webhooks | None             |
+| **Test Coverage**       | PHPUnit suite         | N/A              |
+| **Webhook Helpers**     | Built-in              | Manual           |
 
 ## License
 
@@ -1373,22 +1378,22 @@ MIT License — see [LICENSE](LICENSE).
 4. **Response Format**: All responses now include `ok` and `request_id` fields
 
 5. **Field Names**: Snake_case preferred (both camelCase and snake_case supported for backward compatibility):
-   - `agentProfile` → `agent_profile`
-   - `hideInTaskList` → `hide_in_task_list`
-   - `createShareableLink` → `share_visibility`
+    - `agentProfile` → `agent_profile`
+    - `hideInTaskList` → `hide_in_task_list`
+    - `createShareableLink` → `share_visibility`
 
 6. **Response Keys**: Changed field names in responses:
-   - `status` → `agent_status`
-   - `data` → `tasks` (in list responses)
-   - `id` → `file_id` (for files)
+    - `status` → `agent_status`
+    - `data` → `tasks` (in list responses)
+    - `id` → `file_id` (for files)
 
 7. **Timestamps**: Changed from ISO strings to Unix milliseconds (integers)
 
 8. **Attachments**: New structure with `file_id`, `file_url`, `file_data`
 
 9. **Removed Fields**:
-   - `taskMode` (no longer needed)
-   - `createShareableLink` (replaced by `share_visibility`)
+    - `taskMode` (no longer needed)
+    - `createShareableLink` (replaced by `share_visibility`)
 
 10. **New Methods**:
     - `listMessages()` - Poll task progress
@@ -1433,6 +1438,7 @@ However, **response keys use the new v2 format** (snake_case and new field names
 ## Author
 
 **Igor Sazonov**
+
 - GitHub: [@tigusigalpa](https://github.com/tigusigalpa)
 - Email: sovletig@gmail.com
 
