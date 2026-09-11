@@ -3,6 +3,7 @@
 namespace Tigusigalpa\ManusAI\Laravel;
 
 use Illuminate\Support\ServiceProvider;
+use Tigusigalpa\ManusAI\Contracts\ManusAIClientInterface;
 use Tigusigalpa\ManusAI\ManusAIClient;
 
 class ManusAIServiceProvider extends ServiceProvider
@@ -28,21 +29,29 @@ class ManusAIServiceProvider extends ServiceProvider
         // Merge configuration
         $this->mergeConfigFrom(__DIR__ . '/../../config/manus-ai.php', 'manus-ai');
 
-        // Register singleton
-        $this->app->singleton('manus-ai', function ($app) {
+        // Register one client for the facade and dependency injection.
+        $this->app->singleton(ManusAIClientInterface::class, function ($app) {
             $config = $app['config']->get('manus-ai', []);
 
-            $apiKey = $config['api_key'] ?? null;
-            if (!$apiKey) {
-                throw new \InvalidArgumentException('Manus AI API key must be set in configuration.');
+            $apiKey = (string) ($config['api_key'] ?? '');
+            $bearerToken = (string) ($config['bearer_token'] ?? '');
+            if (trim($apiKey) === '' && trim($bearerToken) === '') {
+                throw new \InvalidArgumentException('Set MANUS_AI_API_KEY or MANUS_AI_BEARER_TOKEN in configuration.');
             }
 
-            $baseUri = $config['base_uri'] ?? 'https://api.manus.ai';
+            $timeouts = $config['timeout'] ?? [];
 
-            return new ManusAIClient($apiKey, $baseUri);
+            return new ManusAIClient(
+                apiKey: $apiKey,
+                baseUri: $config['base_uri'] ?? ManusAIClient::DEFAULT_BASE_URI,
+                bearerToken: $bearerToken,
+                timeout: (int) ($timeouts['request'] ?? ManusAIClient::DEFAULT_TIMEOUT),
+                connectTimeout: (int) ($timeouts['connect'] ?? ManusAIClient::DEFAULT_CONNECT_TIMEOUT),
+                defaultTaskOptions: $config['default_options'] ?? [],
+            );
         });
 
-        // Register alias
-        $this->app->alias('manus-ai', ManusAIClient::class);
+        $this->app->alias(ManusAIClientInterface::class, 'manus-ai');
+        $this->app->alias(ManusAIClientInterface::class, ManusAIClient::class);
     }
 }

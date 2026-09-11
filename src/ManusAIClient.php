@@ -4,110 +4,109 @@ namespace Tigusigalpa\ManusAI;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use Psr\Http\Message\ResponseInterface;
 use Tigusigalpa\ManusAI\Contracts\ManusAIClientInterface;
 use Tigusigalpa\ManusAI\Exceptions\AuthenticationException;
 use Tigusigalpa\ManusAI\Exceptions\ManusAIException;
 use Tigusigalpa\ManusAI\Exceptions\ValidationException;
 
+/**
+ * Client for Manus API v2.
+ *
+ * Methods return API responses as associative arrays. Detail methods also expose
+ * the nested resource at the top level for convenient access.
+ */
 class ManusAIClient implements ManusAIClientInterface
 {
+    public const DEFAULT_BASE_URI = 'https://api.manus.ai';
+    public const DEFAULT_TIMEOUT = 30;
+    public const DEFAULT_CONNECT_TIMEOUT = 10;
+    private const MAX_RESPONSE_BYTES = 4 * 1024 * 1024;
+
     private Client $http;
     private string $apiKey;
+    private string $bearerToken;
     private string $baseUri;
 
-    public function __construct(string $apiKey, string $baseUri = 'https://api.manus.ai', ?Client $httpClient = null)
-    {
-        if (empty(trim($apiKey))) {
-            throw new AuthenticationException('API key cannot be empty');
+    /** @var array<string, mixed> */
+    private array $defaultTaskOptions;
+
+    /**
+     * @param array<string, mixed> $defaultTaskOptions
+     */
+    public function __construct(
+        string $apiKey = '',
+        string $baseUri = self::DEFAULT_BASE_URI,
+        ?Client $httpClient = null,
+        ?string $bearerToken = null,
+        int $timeout = self::DEFAULT_TIMEOUT,
+        int $connectTimeout = self::DEFAULT_CONNECT_TIMEOUT,
+        array $defaultTaskOptions = [],
+    ) {
+        $this->apiKey = trim($apiKey);
+        $this->bearerToken = trim((string) $bearerToken);
+
+        if ($this->apiKey === '' && $this->bearerToken === '') {
+            throw new AuthenticationException('API key or bearer token cannot be empty');
+        }
+        if ($this->apiKey !== '' && $this->bearerToken !== '') {
+            throw new ValidationException('API key and bearer token cannot be used together');
         }
 
-        $this->apiKey = $apiKey;
-        $this->baseUri = rtrim($baseUri, '/');
-        $this->http = $httpClient ?: new Client([
+        $this->baseUri = $this->validateBaseUri($baseUri);
+        if ($timeout <= 0 || $connectTimeout <= 0) {
+            throw new ValidationException('Request timeouts must be greater than zero');
+        }
+
+        $this->http = $httpClient ?? new Client([
             'base_uri' => $this->baseUri,
-            'timeout' => 30,
-            'connect_timeout' => 10,
+            'timeout' => $timeout,
+            'connect_timeout' => $connectTimeout,
         ]);
+        $this->defaultTaskOptions = $defaultTaskOptions;
     }
 
     /**
-     * Create a new task
+     * @param array<string, mixed> $options
+     * @return array<string, mixed>
      */
     public function createTask(string $prompt, array $options = []): array
     {
-        if (empty(trim($prompt))) {
+        if (trim($prompt) === '') {
             throw new ValidationException('Task prompt cannot be empty');
         }
 
+        $options = array_replace($this->defaultTaskOptions, $options);
         $message = [
-            'content' => [
-                [
-                    'type' => 'text',
-                    'text' => $prompt,
-                ],
-            ],
+            'content' => [[
+                'type' => 'text',
+                'text' => $prompt,
+            ]],
         ];
+        $payload = [];
 
-        $payload = [
-            'message' => $message,
-        ];
+        $this->copyOption($options, $payload, 'agent_profile', 'agentProfile');
+        $this->copyOption($options, $payload, 'locale');
+        $this->copyOption($options, $payload, 'hide_in_task_list', 'hideInTaskList');
+        $this->copyOption($options, $payload, 'share_visibility', 'shareVisibility');
+        $this->copyOption($options, $payload, 'title');
+        $this->copyOption($options, $payload, 'project_id', 'projectId');
+        $this->copyOption($options, $payload, 'interactive_mode', 'interactiveMode', 'enable_ask_user', 'enableAskUser');
+        $this->copyOption($options, $payload, 'structured_output_schema', 'structuredOutputSchema');
 
-        if (isset($options['agent_profile'])) {
-            $payload['agent_profile'] = $options['agent_profile'];
-        } elseif (isset($options['agentProfile'])) {
-            $payload['agent_profile'] = $options['agentProfile'];
-        }
+        $this->copyOption($options, $message, 'connectors');
+        $this->copyOption($options, $message, 'enable_skills', 'enableSkills');
+        $this->copyOption($options, $message, 'force_skills', 'forceSkills');
+        $this->copyOption($options, $message, 'task_references', 'taskReferences');
 
-        if (isset($options['locale'])) {
-            $payload['locale'] = $options['locale'];
-        }
-
-        if (isset($options['hide_in_task_list'])) {
-            $payload['hide_in_task_list'] = $options['hide_in_task_list'];
-        } elseif (isset($options['hideInTaskList'])) {
-            $payload['hide_in_task_list'] = $options['hideInTaskList'];
-        }
-
-        if (isset($options['share_visibility'])) {
-            $payload['share_visibility'] = $options['share_visibility'];
-        } elseif (isset($options['shareVisibility'])) {
-            $payload['share_visibility'] = $options['shareVisibility'];
-        }
-
-        if (isset($options['title'])) {
-            $payload['title'] = $options['title'];
-        }
-
-        if (isset($options['project_id'])) {
-            $payload['project_id'] = $options['project_id'];
-        } elseif (isset($options['projectId'])) {
-            $payload['project_id'] = $options['projectId'];
-        }
-
-        if (isset($options['enable_ask_user'])) {
-            $payload['enable_ask_user'] = $options['enable_ask_user'];
-        } elseif (isset($options['enableAskUser'])) {
-            $payload['enable_ask_user'] = $options['enableAskUser'];
-        }
-
-        if (isset($options['connectors'])) {
-            $message['connectors'] = $options['connectors'];
-        }
-
-        if (isset($options['enable_skills'])) {
-            $message['enable_skills'] = $options['enable_skills'];
-        } elseif (isset($options['enableSkills'])) {
-            $message['enable_skills'] = $options['enableSkills'];
-        }
-
-        if (isset($options['force_skills'])) {
-            $message['force_skills'] = $options['force_skills'];
-        } elseif (isset($options['forceSkills'])) {
-            $message['force_skills'] = $options['forceSkills'];
-        }
-
-        if (isset($options['attachments']) && is_array($options['attachments'])) {
+        if (array_key_exists('attachments', $options) && $options['attachments'] !== null) {
+            if (!is_array($options['attachments'])) {
+                throw new ValidationException('Attachments must be an array of attachment arrays');
+            }
             foreach ($options['attachments'] as $attachment) {
+                if (!is_array($attachment)) {
+                    throw new ValidationException('Each attachment must be an array');
+                }
                 $message['content'][] = $attachment;
             }
         }
@@ -118,16 +117,14 @@ class ManusAIClient implements ManusAIClientInterface
     }
 
     /**
-     * Get list of tasks with optional filtering and pagination
+     * @param array<string, mixed> $filters
+     * @return array<string, mixed>
      */
     public function getTasks(array $filters = []): array
     {
         $query = [];
-        
-        $allowedFilters = ['cursor', 'limit', 'order', 'scope', 'agent_id', 'project_id'];
-        
-        foreach ($allowedFilters as $filter) {
-            if (isset($filters[$filter])) {
+        foreach (['cursor', 'limit', 'order', 'scope', 'agent_id', 'project_id', 'oauth_client_id', 'api_key_id'] as $filter) {
+            if (array_key_exists($filter, $filters) && $filters[$filter] !== null) {
                 $query[$filter] = $filters[$filter];
             }
         }
@@ -135,55 +132,39 @@ class ManusAIClient implements ManusAIClientInterface
         return $this->request('GET', '/v2/task.list', null, $query);
     }
 
-    /**
-     * Get a specific task by ID
-     */
+    /** @return array<string, mixed> */
     public function getTask(string $taskId): array
     {
-        if (empty(trim($taskId))) {
-            throw new ValidationException('Task ID cannot be empty');
-        }
+        $this->requireIdentifier($taskId, 'Task ID');
 
-        return $this->request('GET', '/v2/task.detail', null, ['task_id' => $taskId]);
+        return $this->promoteResource(
+            $this->request('GET', '/v2/task.detail', null, ['task_id' => $taskId]),
+            'task',
+        );
     }
 
     /**
-     * Update a task's metadata
+     * @param array<string, mixed> $updates
+     * @return array<string, mixed>
      */
     public function updateTask(string $taskId, array $updates): array
     {
-        if (empty(trim($taskId))) {
-            throw new ValidationException('Task ID cannot be empty');
-        }
-
-        if (empty($updates)) {
+        $this->requireIdentifier($taskId, 'Task ID');
+        if ($updates === []) {
             throw new ValidationException('Updates array cannot be empty');
         }
 
         $payload = ['task_id' => $taskId];
         $hasUpdates = false;
+        $hasUpdates = $this->copyOption($updates, $payload, 'title') || $hasUpdates;
+        $hasUpdates = $this->copyOption($updates, $payload, 'share_visibility', 'shareVisibility') || $hasUpdates;
+        $hasUpdates = $this->copyOption($updates, $payload, 'enable_visible_in_task_list', 'enableVisibleInTaskList') || $hasUpdates;
 
-        if (isset($updates['title'])) {
-            $payload['title'] = $updates['title'];
+        $legacyVisibility = $this->optionValue($updates, 'hide_in_task_list', 'hideInTaskList');
+        if (!$hasUpdates && $legacyVisibility['found']) {
+            $payload['enable_visible_in_task_list'] = !(bool) $legacyVisibility['value'];
             $hasUpdates = true;
         }
-
-        if (isset($updates['share_visibility'])) {
-            $payload['share_visibility'] = $updates['share_visibility'];
-            $hasUpdates = true;
-        } elseif (isset($updates['shareVisibility'])) {
-            $payload['share_visibility'] = $updates['shareVisibility'];
-            $hasUpdates = true;
-        }
-
-        if (isset($updates['hide_in_task_list'])) {
-            $payload['hide_in_task_list'] = $updates['hide_in_task_list'];
-            $hasUpdates = true;
-        } elseif (isset($updates['hideInTaskList'])) {
-            $payload['hide_in_task_list'] = $updates['hideInTaskList'];
-            $hasUpdates = true;
-        }
-
         if (!$hasUpdates) {
             throw new ValidationException('No valid update fields provided');
         }
@@ -191,149 +172,130 @@ class ManusAIClient implements ManusAIClientInterface
         return $this->request('POST', '/v2/task.update', $payload);
     }
 
-    /**
-     * Delete a task
-     */
+    /** @return array<string, mixed> */
     public function deleteTask(string $taskId): array
     {
-        if (empty(trim($taskId))) {
-            throw new ValidationException('Task ID cannot be empty');
-        }
+        $this->requireIdentifier($taskId, 'Task ID');
 
         return $this->request('POST', '/v2/task.delete', ['task_id' => $taskId]);
     }
 
-    /**
-     * Create a file record and get presigned upload URL
-     */
+    /** @return array<string, mixed> */
     public function createFile(string $filename): array
     {
-        if (empty(trim($filename))) {
-            throw new ValidationException('Filename cannot be empty');
+        $this->requireIdentifier($filename, 'Filename');
+        $response = $this->promoteResource(
+            $this->request('POST', '/v2/file.upload', ['filename' => $filename]),
+            'file',
+        );
+
+        if (isset($response['id']) && !isset($response['file_id'])) {
+            $response['file_id'] = $response['id'];
         }
 
-        return $this->request('POST', '/v2/file.upload', ['filename' => $filename]);
+        return $response;
     }
 
-    /**
-     * Upload file content to presigned URL
-     */
     public function uploadFileContent(string $uploadUrl, string $fileContent, string $contentType = 'application/octet-stream'): bool
     {
-        if (empty(trim($uploadUrl))) {
-            throw new ValidationException('Upload URL cannot be empty');
-        }
+        $this->requireIdentifier($uploadUrl, 'Upload URL');
+        $contentType = trim($contentType) ?: 'application/octet-stream';
 
         try {
             $response = $this->http->put($uploadUrl, [
                 'body' => $fileContent,
-                'headers' => [
-                    'Content-Type' => $contentType,
-                ],
+                'http_errors' => false,
+                'headers' => ['Content-Type' => $contentType],
             ]);
-
-            return $response->getStatusCode() === 200;
-        } catch (GuzzleException $e) {
-            throw new ManusAIException(
-                'Failed to upload file content: ' . $e->getMessage(),
-                $e->getCode(),
-                $e
-            );
+        } catch (GuzzleException $exception) {
+            throw new ManusAIException('Failed to upload file content: ' . $exception->getMessage(), (int) $exception->getCode(), $exception);
         }
+
+        if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
+            $this->throwForResponse($response, 'File upload failed');
+        }
+
+        return true;
     }
 
     /**
-     * List files (returns 10 most recent)
+     * Manus API v2 has no file-list endpoint.
+     *
+     * @deprecated Retained only so existing code fails safely instead of requesting a non-existent endpoint.
+     * @return never
      */
-    public function listFiles(int $limit = 0, string $cursor = ''): array
+    public function listFiles(int $limit = 0, string $cursor = ''): never
     {
-        $query = [];
-        if ($limit > 0) {
-            $query['limit'] = $limit;
-        }
-        if (!empty($cursor)) {
-            $query['cursor'] = $cursor;
-        }
-
-        return $this->request('GET', '/v2/file.list', null, $query);
+        throw new ValidationException('Manus API v2 does not provide a file-list endpoint');
     }
 
-    /**
-     * Get file details by ID
-     */
+    /** @return array<string, mixed> */
     public function getFile(string $fileId): array
     {
-        if (empty(trim($fileId))) {
-            throw new ValidationException('File ID cannot be empty');
+        $this->requireIdentifier($fileId, 'File ID');
+        $response = $this->promoteResource(
+            $this->request('GET', '/v2/file.detail', null, ['file_id' => $fileId]),
+            'file',
+        );
+
+        if (isset($response['id']) && !isset($response['file_id'])) {
+            $response['file_id'] = $response['id'];
         }
 
-        return $this->request('GET', '/v2/file.detail', null, ['file_id' => $fileId]);
+        return $response;
     }
 
-    /**
-     * Delete a file
-     */
+    /** @return array<string, mixed> */
     public function deleteFile(string $fileId): array
     {
-        if (empty(trim($fileId))) {
-            throw new ValidationException('File ID cannot be empty');
-        }
+        $this->requireIdentifier($fileId, 'File ID');
 
         return $this->request('POST', '/v2/file.delete', ['file_id' => $fileId]);
     }
 
     /**
-     * Create a webhook
+     * @param array<string, mixed> $webhook
+     * @return array<string, mixed>
      */
     public function createWebhook(array $webhook): array
     {
-        if (empty($webhook)) {
-            throw new ValidationException('Webhook configuration cannot be empty');
-        }
-
-        if (!isset($webhook['url'])) {
+        if (!isset($webhook['url']) || !is_string($webhook['url'])) {
             throw new ValidationException('Webhook URL is required');
         }
+        $this->requireIdentifier($webhook['url'], 'Webhook URL');
 
-        $payload = [
-            'url' => $webhook['url'],
-            'events' => $webhook['events'] ?? [],
-        ];
+        $response = $this->promoteResource(
+            $this->request('POST', '/v2/webhook.create', ['url' => $webhook['url']]),
+            'webhook',
+        );
 
-        return $this->request('POST', '/v2/webhook.create', $payload);
-    }
-
-    /**
-     * Delete a webhook
-     */
-    public function deleteWebhook(string $webhookId): bool
-    {
-        if (empty(trim($webhookId))) {
-            throw new ValidationException('Webhook ID cannot be empty');
+        if (isset($response['id']) && !isset($response['webhook_id'])) {
+            $response['webhook_id'] = $response['id'];
         }
 
+        return $response;
+    }
+
+    public function deleteWebhook(string $webhookId): bool
+    {
+        $this->requireIdentifier($webhookId, 'Webhook ID');
         $this->request('POST', '/v2/webhook.delete', ['webhook_id' => $webhookId]);
+
         return true;
     }
 
-    /**
-     * List messages for a task
-     */
+    /** @return array<string, mixed> */
     public function listMessages(string $taskId, int $limit = 50, string $cursor = '', string $order = 'desc', bool $verbose = false): array
     {
-        if (empty(trim($taskId))) {
-            throw new ValidationException('Task ID cannot be empty');
-        }
-
+        $this->requireIdentifier($taskId, 'Task ID');
         $query = ['task_id' => $taskId];
-        
         if ($limit > 0) {
             $query['limit'] = $limit;
         }
-        if (!empty($cursor)) {
+        if (trim($cursor) !== '') {
             $query['cursor'] = $cursor;
         }
-        if (!empty($order)) {
+        if (trim($order) !== '') {
             $query['order'] = $order;
         }
         if ($verbose) {
@@ -344,150 +306,412 @@ class ManusAIClient implements ManusAIClientInterface
     }
 
     /**
-     * Send a message to a task
+     * @param array<int, array<string, mixed>> $attachments
+     * @param array<string, mixed> $options
+     * @return array<string, mixed>
      */
-    public function sendMessage(string $taskId, string $message, array $attachments = []): array
+    public function sendMessage(string $taskId, string $message, array $attachments = [], array $options = []): array
     {
-        if (empty(trim($taskId))) {
-            throw new ValidationException('Task ID cannot be empty');
-        }
-        if (empty(trim($message))) {
+        $this->requireIdentifier($taskId, 'Task ID');
+        if (trim($message) === '') {
             throw new ValidationException('Message cannot be empty');
         }
 
-        $content = [
-            [
-                'type' => 'text',
-                'text' => $message,
-            ],
-        ];
-
-        if (!empty($attachments)) {
-            foreach ($attachments as $attachment) {
-                $content[] = $attachment;
+        $content = [['type' => 'text', 'text' => $message]];
+        foreach ($attachments as $attachment) {
+            if (!is_array($attachment)) {
+                throw new ValidationException('Each attachment must be an array');
             }
+            $content[] = $attachment;
         }
 
-        $payload = [
-            'task_id' => $taskId,
-            'message' => [
-                'content' => $content,
-            ],
-        ];
+        $payload = ['task_id' => $taskId, 'message' => ['content' => $content]];
+        $this->copyOption($options, $payload, 'agent_profile', 'agentProfile');
+        $this->copyOption($options, $payload['message'], 'connectors');
+        $this->copyOption($options, $payload['message'], 'enable_skills', 'enableSkills');
+        $this->copyOption($options, $payload['message'], 'force_skills', 'forceSkills');
+        $this->copyOption($options, $payload['message'], 'task_references', 'taskReferences');
 
         return $this->request('POST', '/v2/task.sendMessage', $payload);
     }
 
-    /**
-     * Stop a running task
-     */
+    /** @return array<string, mixed> */
     public function stopTask(string $taskId): array
     {
-        if (empty(trim($taskId))) {
-            throw new ValidationException('Task ID cannot be empty');
-        }
+        $this->requireIdentifier($taskId, 'Task ID');
 
         return $this->request('POST', '/v2/task.stop', ['task_id' => $taskId]);
     }
 
     /**
-     * Confirm an action waiting for user input
+     * @param array<string, mixed> $input
+     * @return array<string, mixed>
      */
     public function confirmAction(string $taskId, string $eventId, array $input): array
     {
-        if (empty(trim($taskId))) {
-            throw new ValidationException('Task ID cannot be empty');
-        }
-        if (empty(trim($eventId))) {
-            throw new ValidationException('Event ID cannot be empty');
-        }
+        $this->requireIdentifier($taskId, 'Task ID');
+        $this->requireIdentifier($eventId, 'Event ID');
 
-        $payload = [
+        return $this->request('POST', '/v2/task.confirmAction', [
             'task_id' => $taskId,
             'event_id' => $eventId,
             'input' => $input,
-        ];
+        ]);
+    }
 
-        return $this->request('POST', '/v2/task.confirmAction', $payload);
+    /** @return array<string, mixed> */
+    public function createProject(string $name, string $instruction = ''): array
+    {
+        $this->requireIdentifier($name, 'Project name');
+        $payload = ['name' => $name];
+        if (trim($instruction) !== '') {
+            $payload['instruction'] = $instruction;
+        }
+
+        return $this->request('POST', '/v2/project.create', $payload);
+    }
+
+    /** @return array<string, mixed> */
+    public function listProjects(): array
+    {
+        return $this->request('GET', '/v2/project.list');
+    }
+
+    /** @return array<string, mixed> */
+    public function listSkills(string $projectId = ''): array
+    {
+        return $this->request('GET', '/v2/skill.list', null, trim($projectId) === '' ? [] : ['project_id' => $projectId]);
+    }
+
+    /** @return array<string, mixed> */
+    public function listAgents(): array
+    {
+        return $this->request('GET', '/v2/agent.list');
+    }
+
+    /** @return array<string, mixed> */
+    public function getAgent(string $agentId): array
+    {
+        $this->requireIdentifier($agentId, 'Agent ID');
+
+        return $this->request('GET', '/v2/agent.detail', null, ['agent_id' => $agentId]);
     }
 
     /**
-     * Make HTTP request to Manus AI API
-     *
-     * @param string $method HTTP method
-     * @param string $endpoint API endpoint
-     * @param array|null $body Request body
-     * @param array $query Query parameters
-     * @return array Response data
-     * @throws ManusAIException
+     * @param array<string, mixed> $updates
+     * @return array<string, mixed>
+     */
+    public function updateAgent(string $agentId, array $updates): array
+    {
+        $this->requireIdentifier($agentId, 'Agent ID');
+        $payload = ['agent_id' => $agentId];
+        $hasUpdates = $this->copyOption($updates, $payload, 'nickname')
+            || $this->copyOption($updates, $payload, 'about');
+        if (!$hasUpdates) {
+            throw new ValidationException('At least one agent update field is required');
+        }
+
+        return $this->request('POST', '/v2/agent.update', $payload);
+    }
+
+    /** @return array<string, mixed> */
+    public function listWebhooks(): array
+    {
+        return $this->request('GET', '/v2/webhook.list');
+    }
+
+    /** @return array<string, mixed> */
+    public function listOnlineBrowserClients(): array
+    {
+        return $this->request('GET', '/v2/browser.onlineList');
+    }
+
+    /** @return array<string, mixed> */
+    public function getWebhookPublicKey(): array
+    {
+        return $this->request('GET', '/v2/webhook.publicKey');
+    }
+
+    /** @return array<string, mixed> */
+    public function listConnectors(): array
+    {
+        return $this->request('GET', '/v2/connector.list');
+    }
+
+    /** @return array<string, mixed> */
+    public function listUsage(int $limit = 0, string $cursor = ''): array
+    {
+        return $this->request('GET', '/v2/usage.list', null, $this->paginationQuery($limit, $cursor));
+    }
+
+    /** @return array<string, mixed> */
+    public function getTeamUsageStatistic(string $startDate = '', string $endDate = ''): array
+    {
+        return $this->request('GET', '/v2/usage.teamStatistic', null, $this->dateRangeQuery($startDate, $endDate));
+    }
+
+    /**
+     * @param array<string, mixed> $filters
+     * @return array<string, mixed>
+     */
+    public function listTeamUsageLog(array $filters = []): array
+    {
+        $query = [];
+        foreach (['limit', 'cursor', 'start_date', 'end_date', 'sort_by', 'is_asc'] as $filter) {
+            if (array_key_exists($filter, $filters) && $filters[$filter] !== null) {
+                $query[$filter] = $filters[$filter];
+            }
+        }
+
+        return $this->request('GET', '/v2/usage.teamLog', null, $query);
+    }
+
+    /** @return array<string, mixed> */
+    public function getAvailableCredits(): array
+    {
+        return $this->request('GET', '/v2/usage.availableCredits');
+    }
+
+    /** @return array<string, mixed> */
+    public function getWebsiteStatus(string $taskId, string $websiteId): array
+    {
+        return $this->request('GET', '/v2/website.status', null, $this->websitePayload($taskId, $websiteId));
+    }
+
+    /** @return array<string, mixed> */
+    public function listWebsiteCheckpoints(string $taskId, string $websiteId): array
+    {
+        return $this->request('GET', '/v2/website.listCheckpoints', null, $this->websitePayload($taskId, $websiteId));
+    }
+
+    /** @return array<string, mixed> */
+    public function publishWebsite(string $taskId, string $websiteId, string $visibility = ''): array
+    {
+        $payload = $this->websitePayload($taskId, $websiteId);
+        if (trim($visibility) !== '') {
+            $payload['visibility'] = $visibility;
+        }
+
+        return $this->request('POST', '/v2/website.publish', $payload);
+    }
+
+    /**
+     * @param array<string, mixed> $updates
+     * @return array<string, mixed>
+     */
+    public function updateWebsite(string $taskId, string $websiteId, array $updates): array
+    {
+        $payload = $this->websitePayload($taskId, $websiteId);
+        $hasUpdates = $this->copyOption($updates, $payload, 'title')
+            || $this->copyOption($updates, $payload, 'visibility');
+        if (!$hasUpdates) {
+            throw new ValidationException('At least one website update field is required');
+        }
+
+        return $this->request('POST', '/v2/website.update', $payload);
+    }
+
+    /**
+     * @param array<string, mixed>|null $body
+     * @param array<string, mixed> $query
+     * @return array<string, mixed>
      */
     private function request(string $method, string $endpoint, ?array $body = null, array $query = []): array
     {
-        try {
-            $options = [
-                'headers' => [
-                    'x-manus-api-key' => $this->apiKey,
-                    'Content-Type' => 'application/json',
-                    'Accept' => 'application/json',
-                ],
-            ];
+        $headers = [
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+        ];
+        $headers[$this->bearerToken === '' ? 'x-manus-api-key' : 'Authorization'] = $this->bearerToken === ''
+            ? $this->apiKey
+            : 'Bearer ' . $this->bearerToken;
 
-            if ($body !== null) {
-                $options['json'] = $body;
-            }
-
-            if (!empty($query)) {
-                $options['query'] = $query;
-            }
-
-            $response = $this->http->request($method, $endpoint, $options);
-            
-            $statusCode = $response->getStatusCode();
-            
-            // Handle 204 No Content
-            if ($statusCode === 204) {
-                return [];
-            }
-
-            $content = (string) $response->getBody();
-            
-            if (empty($content)) {
-                return [];
-            }
-
-            $data = json_decode($content, true);
-
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                throw new ManusAIException('Invalid JSON response: ' . json_last_error_msg());
-            }
-
-            return $data;
-
-        } catch (GuzzleException $e) {
-            $statusCode = $e->getCode();
-            $message = $e->getMessage();
-
-            if ($statusCode === 401 || $statusCode === 403) {
-                throw new AuthenticationException(
-                    'Authentication failed: ' . $message,
-                    $statusCode,
-                    $e
-                );
-            }
-
-            if ($statusCode === 400) {
-                throw new ValidationException(
-                    'Validation error: ' . $message,
-                    $statusCode,
-                    $e
-                );
-            }
-
-            throw new ManusAIException(
-                'API request failed: ' . $message,
-                $statusCode,
-                $e
-            );
+        $options = ['headers' => $headers, 'http_errors' => false];
+        if ($body !== null) {
+            $options['json'] = $body;
         }
+        if ($query !== []) {
+            $options['query'] = $query;
+        }
+
+        try {
+            // Use an absolute URI so injected Guzzle clients do not need their own base_uri.
+            $response = $this->http->request($method, $this->baseUri . $endpoint, $options);
+        } catch (GuzzleException $exception) {
+            throw new ManusAIException('API request failed: ' . $exception->getMessage(), (int) $exception->getCode(), $exception);
+        }
+
+        if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
+            $this->throwForResponse($response, 'API request failed');
+        }
+
+        $content = $this->readResponseContent($response);
+        if ($content === '') {
+            return [];
+        }
+
+        try {
+            $data = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException $exception) {
+            throw new ManusAIException('Invalid JSON response: ' . $exception->getMessage(), 0, $exception);
+        }
+        if (!is_array($data)) {
+            throw new ManusAIException('Invalid JSON response: expected an object');
+        }
+        if (($data['ok'] ?? true) === false) {
+            $this->throwApiError($response->getStatusCode(), $data, 'API request failed');
+        }
+
+        return $data;
+    }
+
+    private function validateBaseUri(string $baseUri): string
+    {
+        $baseUri = rtrim(trim($baseUri), '/');
+        $parts = parse_url($baseUri);
+        if ($baseUri === '' || $parts === false || !isset($parts['scheme'], $parts['host']) || !in_array($parts['scheme'], ['http', 'https'], true)) {
+            throw new ValidationException('Base URI must be an absolute HTTP or HTTPS URL');
+        }
+
+        return $baseUri;
+    }
+
+    private function requireIdentifier(string $value, string $name): void
+    {
+        if (trim($value) === '') {
+            throw new ValidationException("{$name} cannot be empty");
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $source
+     * @param array<string, mixed> $target
+     */
+    private function copyOption(array $source, array &$target, string $canonicalKey, string ...$aliases): bool
+    {
+        $option = $this->optionValue($source, $canonicalKey, ...$aliases);
+        if (!$option['found']) {
+            return false;
+        }
+        $target[$canonicalKey] = $option['value'];
+
+        return true;
+    }
+
+    /**
+     * @param array<string, mixed> $options
+     * @return array{found: bool, value: mixed}
+     */
+    private function optionValue(array $options, string ...$keys): array
+    {
+        foreach ($keys as $key) {
+            if (array_key_exists($key, $options) && $options[$key] !== null) {
+                return ['found' => true, 'value' => $options[$key]];
+            }
+        }
+
+        return ['found' => false, 'value' => null];
+    }
+
+    /**
+     * @param array<string, mixed> $response
+     * @return array<string, mixed>
+     */
+    private function promoteResource(array $response, string $resource): array
+    {
+        if (!isset($response[$resource]) || !is_array($response[$resource])) {
+            return $response;
+        }
+
+        return array_replace($response, $response[$resource]);
+    }
+
+    /** @return array<string, mixed> */
+    private function paginationQuery(int $limit, string $cursor): array
+    {
+        $query = [];
+        if ($limit > 0) {
+            $query['limit'] = $limit;
+        }
+        if (trim($cursor) !== '') {
+            $query['cursor'] = $cursor;
+        }
+
+        return $query;
+    }
+
+    /** @return array<string, mixed> */
+    private function dateRangeQuery(string $startDate, string $endDate): array
+    {
+        $query = [];
+        if (trim($startDate) !== '') {
+            $query['start_date'] = $startDate;
+        }
+        if (trim($endDate) !== '') {
+            $query['end_date'] = $endDate;
+        }
+
+        return $query;
+    }
+
+    /** @return array<string, string> */
+    private function websitePayload(string $taskId, string $websiteId): array
+    {
+        $this->requireIdentifier($taskId, 'Task ID');
+        $this->requireIdentifier($websiteId, 'Website ID');
+
+        return ['task_id' => $taskId, 'website_id' => $websiteId];
+    }
+
+    private function readResponseContent(ResponseInterface $response): string
+    {
+        $body = $response->getBody();
+        if ($body->getSize() !== null && $body->getSize() > self::MAX_RESPONSE_BYTES) {
+            throw new ManusAIException('Response body exceeds ' . self::MAX_RESPONSE_BYTES . ' bytes');
+        }
+
+        if ($body->isSeekable()) {
+            $body->rewind();
+        }
+        $content = $body->read(self::MAX_RESPONSE_BYTES + 1);
+        if (strlen($content) > self::MAX_RESPONSE_BYTES) {
+            throw new ManusAIException('Response body exceeds ' . self::MAX_RESPONSE_BYTES . ' bytes');
+        }
+
+        return $content;
+    }
+
+    /** @return never */
+    private function throwForResponse(ResponseInterface $response, string $prefix): never
+    {
+        $content = $this->readResponseContent($response);
+        $data = json_decode($content, true);
+        $this->throwApiError($response->getStatusCode(), is_array($data) ? $data : [], $prefix, $content);
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     * @return never
+     */
+    private function throwApiError(int $statusCode, array $data, string $prefix, string $fallbackBody = ''): never
+    {
+        $error = is_array($data['error'] ?? null) ? $data['error'] : [];
+        $message = is_string($error['message'] ?? null) ? $error['message'] : ($fallbackBody !== '' ? $fallbackBody : 'Unknown error');
+        $requestId = is_string($data['request_id'] ?? null) ? $data['request_id'] : null;
+        $context = [
+            'status_code' => $statusCode,
+            'request_id' => $requestId,
+            'error_code' => $error['code'] ?? null,
+        ];
+        $description = $prefix . ': ' . $message . ($requestId !== null ? " (request_id: {$requestId})" : '');
+
+        if ($statusCode === 401 || $statusCode === 403) {
+            throw new AuthenticationException($description, $statusCode, null, $context);
+        }
+        if ($statusCode === 400 || ($error['code'] ?? null) === 'invalid_argument') {
+            throw new ValidationException($description, $statusCode, null, $context);
+        }
+
+        throw new ManusAIException($description, $statusCode, null, $context);
     }
 }

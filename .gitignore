@@ -3,6 +3,8 @@
 /.idea/
 /.vscode/
 /coverage/
+/coverage.xml
+/test-results.xml
 .phpunit.result.cache
 .phpunit.cache
 composer.lock

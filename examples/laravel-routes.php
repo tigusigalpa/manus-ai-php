@@ -2,6 +2,8 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 use Tigusigalpa\ManusAI\Laravel\ManusAI;
 use Tigusigalpa\ManusAI\Helpers\TaskAttachment;
 
@@ -12,8 +14,7 @@ Route::get('/manus-ai/demo', function () {
     try {
         // Using Facade
         $result = ManusAI::createTask('Explain Laravel routing in 3 sentences', [
-            'agentProfile' => 'manus-1.6',
-            'taskMode' => 'chat',
+            'agent_profile' => 'standard',
         ]);
 
         return response()->json([
@@ -64,7 +65,7 @@ Route::post('/manus-ai/task-with-file', function (Request $request) {
         // Upload file content
         $fileContent = file_get_contents($request->file('file')->getRealPath());
         $mimeType = $request->file('file')->getMimeType();
-        
+
         ManusAI::uploadFileContent(
             $fileResult['upload_url'],
             $fileContent,
@@ -72,8 +73,8 @@ Route::post('/manus-ai/task-with-file', function (Request $request) {
         );
 
         // Create task with attachment
-        $attachment = TaskAttachment::fromFileId($fileResult['id']);
-        
+        $attachment = TaskAttachment::fromFileId($fileResult['file_id']);
+
         $taskResult = ManusAI::createTask($request->input('prompt'), [
             'agentProfile' => 'manus-1.6',
             'attachments' => [$attachment],

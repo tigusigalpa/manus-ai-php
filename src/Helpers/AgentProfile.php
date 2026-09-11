@@ -4,18 +4,27 @@ namespace Tigusigalpa\ManusAI\Helpers;
 
 class AgentProfile
 {
+    /** Current default profile. */
+    public const STANDARD = 'standard';
+
+    /** Faster, lower-cost profile. */
+    public const LITE = 'lite';
+
+    /** Highest-capability profile. */
+    public const MAX = 'max';
+
     /**
-     * Manus 1.6 - Latest and most capable model (recommended)
+     * Legacy alias accepted by Manus for STANDARD.
      */
     public const MANUS_1_6 = 'manus-1.6';
 
     /**
-     * Manus 1.6 Lite - Faster, lightweight version
+     * Legacy alias accepted by Manus for LITE.
      */
     public const MANUS_1_6_LITE = 'manus-1.6-lite';
 
     /**
-     * Manus 1.6 Max - Maximum capability version
+     * Legacy alias accepted by Manus for MAX.
      */
     public const MANUS_1_6_MAX = 'manus-1.6-max';
 
@@ -39,6 +48,9 @@ class AgentProfile
     public static function all(): array
     {
         return [
+            self::STANDARD,
+            self::LITE,
+            self::MAX,
             self::MANUS_1_6,
             self::MANUS_1_6_LITE,
             self::MANUS_1_6_MAX,
@@ -55,9 +67,9 @@ class AgentProfile
     public static function recommended(): array
     {
         return [
-            self::MANUS_1_6,
-            self::MANUS_1_6_LITE,
-            self::MANUS_1_6_MAX,
+            self::STANDARD,
+            self::LITE,
+            self::MAX,
         ];
     }
 
@@ -80,6 +92,12 @@ class AgentProfile
      */
     public static function isDeprecated(string $profile): bool
     {
-        return in_array($profile, [self::SPEED, self::QUALITY], true);
+        return in_array($profile, [
+            self::MANUS_1_6,
+            self::MANUS_1_6_LITE,
+            self::MANUS_1_6_MAX,
+            self::SPEED,
+            self::QUALITY,
+        ], true);
     }
 }

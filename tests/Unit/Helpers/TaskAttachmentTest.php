@@ -11,7 +11,7 @@ class TaskAttachmentTest extends TestCase
     {
         $attachment = TaskAttachment::fromFileId('file_123');
 
-        $this->assertEquals('file_id', $attachment['type']);
+        $this->assertEquals('file', $attachment['type']);
         $this->assertEquals('file_123', $attachment['file_id']);
     }
 
@@ -20,8 +20,8 @@ class TaskAttachmentTest extends TestCase
         $url = 'https://example.com/file.pdf';
         $attachment = TaskAttachment::fromUrl($url);
 
-        $this->assertEquals('url', $attachment['type']);
-        $this->assertEquals($url, $attachment['url']);
+        $this->assertEquals('file', $attachment['type']);
+        $this->assertEquals($url, $attachment['file_url']);
     }
 
     public function test_from_base64(): void
@@ -31,8 +31,8 @@ class TaskAttachmentTest extends TestCase
         
         $attachment = TaskAttachment::fromBase64($base64Data, $mimeType);
 
-        $this->assertEquals('data', $attachment['type']);
-        $this->assertEquals($base64Data, $attachment['data']);
+        $this->assertEquals('file', $attachment['type']);
+        $this->assertEquals($base64Data, $attachment['file_data']);
         $this->assertEquals($mimeType, $attachment['mime_type']);
     }
 }

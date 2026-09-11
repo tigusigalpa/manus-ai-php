@@ -14,8 +14,7 @@ try {
     // 1. Create a simple task
     echo "1. Creating a task...\n";
     $result = $client->createTask('Write a short poem about PHP programming', [
-        'agentProfile' => 'manus-1.6',
-        'taskMode' => 'chat',
+        'agent_profile' => 'standard',
     ]);
 
     echo "Task created successfully!\n";
@@ -30,7 +29,7 @@ try {
     
     $task = $client->getTask($taskId);
     echo "Status: {$task['status']}\n";
-    echo "Model: {$task['model']}\n\n";
+    echo "Agent profile: " . ($task['agent_profile'] ?? 'not available') . "\n\n";
 
     // 3. List recent tasks
     echo "3. Listing recent tasks...\n";

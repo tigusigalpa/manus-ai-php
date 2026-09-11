@@ -11,11 +11,9 @@ class ManusAITaskCommand extends Command
                             {action : Action to perform: create, list, get, update, delete}
                             {--id= : Task ID for get, update, or delete actions}
                             {--prompt= : Task prompt for create action}
-                            {--profile=manus-1.6 : Agent profile (manus-1.6, manus-1.6-lite, manus-1.6-max)}
-                            {--mode=agent : Task mode (chat, adaptive, agent)}
+                            {--profile=standard : Agent profile (standard, lite, max)}
                             {--title= : New title for update action}
-                            {--limit=10 : Number of tasks to retrieve in list action}
-                            {--status=* : Filter by status (pending, running, completed, failed)}';
+                            {--limit=10 : Number of tasks to retrieve in list action}';
 
     protected $description = 'Manage Manus AI tasks via CLI';
 
@@ -50,8 +48,7 @@ class ManusAITaskCommand extends Command
         $this->info('Creating task...');
         
         $result = $client->createTask($prompt, [
-            'agentProfile' => $this->option('profile'),
-            'taskMode' => $this->option('mode'),
+            'agent_profile' => $this->option('profile'),
         ]);
 
         $this->info('✅ Task created successfully!');
@@ -75,11 +72,6 @@ class ManusAITaskCommand extends Command
             'limit' => (int) $this->option('limit'),
         ];
 
-        $statuses = $this->option('status');
-        if (!empty($statuses)) {
-            $filters['status'] = $statuses;
-        }
-
         $result = $client->getTasks($filters);
 
         if (empty($result['data'])) {
@@ -91,14 +83,14 @@ class ManusAITaskCommand extends Command
             return [
                 'ID' => $task['id'] ?? 'N/A',
                 'Status' => $task['status'] ?? 'N/A',
-                'Created' => isset($task['created_at']) ? date('Y-m-d H:i:s', $task['created_at']) : 'N/A',
+                'Created' => $this->formatTimestamp($task['created_at'] ?? null),
             ];
         }, $result['data']);
 
         $this->table(['ID', 'Status', 'Created'], $tasks);
         
         if ($result['has_more'] ?? false) {
-            $this->info('More tasks available. Last ID: ' . ($result['last_id'] ?? 'N/A'));
+            $this->info('More tasks available. Next cursor: ' . ($result['next_cursor'] ?? 'N/A'));
         }
 
         return Command::SUCCESS;
@@ -122,21 +114,14 @@ class ManusAITaskCommand extends Command
             [
                 ['ID', $task['id'] ?? 'N/A'],
                 ['Status', $task['status'] ?? 'N/A'],
-                ['Model', $task['model'] ?? 'N/A'],
-                ['Created', isset($task['created_at']) ? date('Y-m-d H:i:s', $task['created_at']) : 'N/A'],
-                ['Updated', isset($task['updated_at']) ? date('Y-m-d H:i:s', $task['updated_at']) : 'N/A'],
+                ['Profile', $task['agent_profile'] ?? 'N/A'],
+                ['Created', $this->formatTimestamp($task['created_at'] ?? null)],
+                ['Updated', $this->formatTimestamp($task['updated_at'] ?? null)],
                 ['Credits Used', $task['credit_usage'] ?? 'N/A'],
             ]
         );
 
-        if (isset($task['output']) && is_array($task['output'])) {
-            $this->info('Task Output:');
-            foreach ($task['output'] as $index => $message) {
-                $role = $message['role'] ?? 'unknown';
-                $content = $message['content'] ?? '';
-                $this->line("  [{$index}] {$role}: " . substr($content, 0, 200));
-            }
-        }
+        $this->line('Use task.listMessages to read the task event history and output.');
 
         return Command::SUCCESS;
     }
@@ -192,5 +177,19 @@ class ManusAITaskCommand extends Command
         $this->info('✅ Task deleted successfully!');
 
         return Command::SUCCESS;
+    }
+
+    private function formatTimestamp(mixed $timestamp): string
+    {
+        if (!is_numeric($timestamp)) {
+            return 'N/A';
+        }
+
+        $seconds = (int) $timestamp;
+        if ($seconds > 9_999_999_999) {
+            $seconds = (int) floor($seconds / 1000);
+        }
+
+        return date('Y-m-d H:i:s', $seconds);
     }
 }

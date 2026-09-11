@@ -17,7 +17,7 @@ try {
     $fileResult = $client->createFile('example-document.txt');
     
     echo "File created:\n";
-    echo "File ID: {$fileResult['id']}\n";
+    echo "File ID: {$fileResult['file_id']}\n";
     echo "Upload URL: {$fileResult['upload_url']}\n";
     echo "Expires at: {$fileResult['upload_expires_at']}\n\n";
 
@@ -36,12 +36,12 @@ try {
 
     // 3. Create task with file attachment
     echo "3. Creating task with file attachment...\n";
-    $attachment = TaskAttachment::fromFileId($fileResult['id']);
+    $attachment = TaskAttachment::fromFileId($fileResult['file_id']);
     
     $taskResult = $client->createTask(
         'Analyze the content of the attached file and provide a summary',
         [
-            'agentProfile' => 'manus-1.6',
+            'agent_profile' => 'standard',
             'attachments' => [$attachment],
         ]
     );
@@ -50,14 +50,7 @@ try {
     echo "Task ID: {$taskResult['task_id']}\n";
     echo "Task URL: {$taskResult['task_url']}\n\n";
 
-    // 4. List files
-    echo "4. Listing files...\n";
-    $files = $client->listFiles();
-    echo "Total files: " . count($files['data']) . "\n";
-    foreach ($files['data'] as $file) {
-        echo "  - {$file['filename']} ({$file['status']})\n";
-    }
-    echo "\n";
+    // Keep $fileResult['file_id'] to inspect or delete the uploaded file later.
 
     echo "=== File upload example completed! ===\n";
 

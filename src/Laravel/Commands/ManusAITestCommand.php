@@ -20,8 +20,7 @@ class ManusAITestCommand extends Command
             $this->info("Creating test task: {$taskPrompt}");
             
             $result = $client->createTask($taskPrompt, [
-                'agentProfile' => 'manus-1.6',
-                'taskMode' => 'chat',
+                'agent_profile' => 'standard',
             ]);
 
             $this->info('✅ Task created successfully!');
@@ -40,15 +39,7 @@ class ManusAITestCommand extends Command
                 sleep(2); // Wait a bit for task to process
                 $task = $client->getTask($result['task_id']);
                 $this->line('Status: ' . ($task['status'] ?? 'N/A'));
-                
-                if (isset($task['output']) && is_array($task['output'])) {
-                    $this->info('Task Output:');
-                    foreach ($task['output'] as $message) {
-                        if (isset($message['role']) && isset($message['content'])) {
-                            $this->line("  [{$message['role']}]: " . substr($message['content'], 0, 100));
-                        }
-                    }
-                }
+                $this->line('Use task.listMessages to follow progress and read output.');
             }
 
             $this->newLine();
