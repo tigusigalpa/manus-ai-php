@@ -45,7 +45,7 @@ jobs:
         run: composer test-coverage
 
       - name: Preserve the coverage report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: coverage-clover
           path: coverage.xml
